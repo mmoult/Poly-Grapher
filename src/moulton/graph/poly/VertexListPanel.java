@@ -22,7 +22,7 @@ public class VertexListPanel extends ListPanel {
 		super("25", parent, x, y, shownWidth, shownHeight, "0", color);
 		Panel titlePanel = new Panel(this, 0, 0, null);
 		new Caption("Title:",titlePanel,0,0,font,Alignment.LEFT_ALIGNMENT);
-		new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY);
+		new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY).setClickSelectsAll(true);
 		Panel colorPanel = new Panel(this, 0, 1, null);
 		new Caption("Color:",colorPanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		String fullColor = ""+Integer.toHexString(shape.getColor().getRGB());
@@ -37,6 +37,7 @@ public class VertexListPanel extends ListPanel {
 				return "0";
 			}
 		});
+		colorBox.setClickSelectsAll(true);
 		new Button("newVertex", "New Vertex", this, 0, 2, font, Color.RED);
 		this.shape = shape;
 		this.oldShape = defaultShape? null:shape.clone(); //save the way things are now if the user cancels the edit
@@ -53,7 +54,7 @@ public class VertexListPanel extends ListPanel {
 				if(mc instanceof Button) {
 					Button b = (Button) mc;
 					if(b.getId().length()>11 && b.getId().substring(0, 11).equals("vertexDown:")) {
-						b.setEditable(true);
+						b.setEnabled(true);
 						break;
 					}
 				}
@@ -64,19 +65,23 @@ public class VertexListPanel extends ListPanel {
 		Button vertDown = new Button("vertexDown:"+vertexNum,"v",newVertex,3,0,font,Color.LIGHT_GRAY);
 		Button vertUp = new Button("vertexUp:"+vertexNum, "^",newVertex,2,0,font,Color.LIGHT_GRAY);
 		if(addHeight == 2) {
-			vertUp.setEditable(false);
-			deleteVertex.setEditable(false);
+			vertUp.setEnabled(false);
+			deleteVertex.setEnabled(false);
 		}if(addHeight + 1 == max)
-			vertDown.setEditable(false);
+			vertDown.setEnabled(false);
 		GridFormatter format = newVertex.getGridFormatter();
 		format.specifyColumnWeight(0, 2.0);
 		format.specifyColumnWeight(1, 2.0);
 		TextFormat numberFormat = new NumberFormat();
 		new Caption("(",newVertex, "0","height/2",font,Alignment.LEFT_ALIGNMENT);
 		new Caption(")",newVertex, "4width/7","height/2",font,Alignment.RIGHT_ALIGNMENT);
-		new TextBox("vertexX:"+vertexNum,""+toAdd[0],newVertex,"5","0","2width/7-10","height",font,Color.LIGHT_GRAY).setTextFormat(numberFormat);
+		TextBox vertexX = new TextBox("vertexX:"+vertexNum,""+toAdd[0],newVertex,"5","0","2width/7-10","height",font,Color.LIGHT_GRAY);
+		vertexX.setTextFormat(numberFormat);
+		vertexX.setClickSelectsAll(true);
 		new Caption(",",newVertex, "2width/7-5","height/2",font,Alignment.CENTER_ALIGNMENT);
-		new TextBox("vertexY:"+vertexNum,""+toAdd[1],newVertex,"2width/7","0","2width/7-10", "height", font,Color.LIGHT_GRAY).setTextFormat(numberFormat);
+		TextBox vertexY = new TextBox("vertexY:"+vertexNum,""+toAdd[1],newVertex,"2width/7","0","2width/7-10", "height", font,Color.LIGHT_GRAY);
+		vertexY.setTextFormat(numberFormat);
+		vertexY.setClickSelectsAll(true);
 	}
 
 	public void addVertex(double[] toAdd) {

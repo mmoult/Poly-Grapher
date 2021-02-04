@@ -3,6 +3,7 @@ package moulton.graph.poly;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
@@ -31,11 +32,11 @@ public class PolygonView extends View{
 	@Override
 	public void render(Graphics g, int xx, int yy, int ww, int hh) {
 		//create the image
-		int[] coords = this.getRectRenderCoords(xx, yy, ww, hh, width, height);
-		this.image = new BufferedImage(coords[2],coords[3],BufferedImage.TYPE_INT_RGB);
+		Rectangle coords = this.getRenderRect(xx, yy, ww, hh, width, height);
+		this.image = new BufferedImage(coords.width, coords.height,BufferedImage.TYPE_INT_RGB);
 		Graphics g2 = image.getGraphics();
 		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, coords[2], coords[3]);
+		g2.fillRect(0, 0, coords.width, coords.height);
 		
 		LinkedList<Shape> shapeList = shapes.getShapes();
 		if(!shapeList.isEmpty()) {
@@ -120,9 +121,9 @@ public class PolygonView extends View{
 			String my = limitNumber(lowY + mouseY/yScale, 5);
 			String mouseXY = "(" + mx + ", " + my + ")";
 			FontMetrics fm = g.getFontMetrics();
-			g.fillRect(coords[0], coords[1]+coords[3]-fm.getHeight(), fm.stringWidth(mouseXY), fm.getHeight());
+			g.fillRect(coords.x, coords.y+coords.height-fm.getHeight(), fm.stringWidth(mouseXY), fm.getHeight());
 			g.setColor(Color.BLACK);
-			g.drawString(mouseXY, coords[0], coords[1]+coords[3]-fm.getDescent());
+			g.drawString(mouseXY, coords.x, coords.y+coords.height-fm.getDescent());
 		}
 	}
 	

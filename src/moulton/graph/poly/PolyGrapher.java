@@ -11,6 +11,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -31,7 +33,7 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 	
 	public PolyGrapher(){
 		JFrame frame = new JFrame("PolyGrapher");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.add(this);
 		manager = new Menu(this);
 		manager.createMenu();
@@ -52,6 +54,12 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_48.png")));
 		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_256.png")));
 		frame.setIconImages(icons);
+		
+		frame.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                manager.createExitPopup();
+            }
+        });
 		
 		//start run loop so the screen can refresh
 		run();

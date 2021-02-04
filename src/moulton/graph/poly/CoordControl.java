@@ -20,12 +20,16 @@ public class CoordControl extends Panel{
 		TextFormat numberForm = new NumberFormat();
 		lowX = new TextBox("lowX","0",this,1,0,font,Color.LIGHT_GRAY);
 		lowX.setTextFormat(numberForm);
+		lowX.setClickSelectsAll(true);
 		hiX = new TextBox("hiX","0",this,2,0,font,Color.LIGHT_GRAY);
 		hiX.setTextFormat(numberForm);
+		hiX.setClickSelectsAll(true);
 		lowY = new TextBox("lowY","0",this,1,1,font,Color.LIGHT_GRAY);
 		lowY.setTextFormat(numberForm);
+		lowY.setClickSelectsAll(true);
 		hiY = new TextBox("hiY","0",this,2,1,font,Color.LIGHT_GRAY);
 		hiY.setTextFormat(numberForm);
+		hiY.setClickSelectsAll(true);
 		new Caption("X(",this,0,0,font,Alignment.LEFT_ALIGNMENT);
 		new Caption("Y(",this,0,1,font,Alignment.LEFT_ALIGNMENT);
 		grid.specifyColumnWeight(0, .15);

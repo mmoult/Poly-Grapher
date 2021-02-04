@@ -19,6 +19,7 @@ import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.containers.PartitionPanel;
 import moulton.scalable.draggables.ScrollBar;
+import moulton.scalable.popups.ConfirmationPopup;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
@@ -41,6 +42,8 @@ public class Menu extends MenuManager implements ComponentListener{
 	private Panel shapeOptions;
 	private CoordControl coordControl;
 	private PolygonView view;
+	
+	private String lastFilePath = null;
 	
 
 	public Menu(Container cont) {
@@ -122,9 +125,38 @@ public class Menu extends MenuManager implements ComponentListener{
 			((PolyGrapher)cont).running = false;
 			break;
 		case "save": //save all the shapes in an export friendly way
+			createPopup(false);
+			break;
+		case "load": //load the shapes from file
+			createPopup(true);
+			break;
+		case "clear": //clear the shapes from the content list
+			clear();
+			break;
+		case "newShape":
+			createEditPage(null);
+			view.recenter();
+			break;
+		case "saveShape": //it should already be saved, we just return
+			returnToShapeList();
+			break;
+		case "cancelShape":
+			if(!vertices.cancel()) //if vertices could not cancel, the shape needs to be deleted
+				shapes.removeShape(vertices.getShape());
+			returnToShapeList();
+			view.recenter();
+			break;
+		case "newVertex":
+			vertices.addVertex(new double[] {0,0});
+			view.recenter();
+			break;
+		
+		//Path Finder Pop up actions
+		case "doSave":
+			String toPath = ((PathFinderPopup)popup).getPath();
 			FileWriter fw = null;
 			try {
-				fw = new FileWriter("polygons.txt");
+				fw = new FileWriter(toPath);
 				if(shapes != null) {
 					for(Shape shape:shapes.getShapes()) {
 						fw.write("\""+shape.getTitle()+"\":\n");
@@ -155,12 +187,16 @@ public class Menu extends MenuManager implements ComponentListener{
 					}
 				}
 			}
+			setPopup(null);
+			//if all this worked, save this as the new file directory
+			lastFilePath = toPath.substring(0, toPath.lastIndexOf('\\'));
 			break;
-		case "load": //load the shapes from file
+		case "doLoad":
+			String fromPath = ((PathFinderPopup)popup).getPath();
 			clear();
 			Scanner scan = null;
 			try {
-				scan = new Scanner(new File("polygons.txt"));
+				scan = new Scanner(new File(fromPath));
 				while(scan.hasNextLine()) {
 					String line = scan.nextLine();
 					if(line.isEmpty())
@@ -214,28 +250,27 @@ public class Menu extends MenuManager implements ComponentListener{
 			shapes.updateList();
 			if(view != null)
 				view.recenter();
+			//if all this worked, save this as the new file directory
+			lastFilePath = fromPath.substring(0, fromPath.lastIndexOf('\\'));
+			//fall through to cancel/quit
+		case "cancel":
+			setPopup(null);
 			break;
-		case "clear": //clear the shapes from the content list
-			clear();
+		case "pathUp":
+			((PathFinderPopup)popup).goUpDirectory();
 			break;
-		case "newShape":
-			createEditPage(null);
-			view.recenter();
+		case "directoryButton":
+			((PathFinderPopup)popup).select(((Button)c).getText().substring(2));
 			break;
-		case "saveShape": //it should already be saved, we just return
-			returnToShapeList();
-			break;
-		case "cancelShape":
-			if(!vertices.cancel()) //if vertices could not cancel, the shape needs to be deleted
-				shapes.removeShape(vertices.getShape());
-			returnToShapeList();
-			view.recenter();
-			break;
-		case "newVertex":
-			vertices.addVertex(new double[] {0,0});
-			view.recenter();
+		case "fullExit":
+			System.exit(0);
 			break;
 		}
+	}
+	
+	private void createPopup(boolean shouldLoad) {
+		PathFinderPopup pop = new PathFinderPopup(shouldLoad, "350", "200", lastFilePath);
+		setPopup(pop);
 	}
 	
 	private void clear() {
@@ -282,6 +317,12 @@ public class Menu extends MenuManager implements ComponentListener{
 				break;
 			case "hiY":
 				view.setHighY(Double.parseDouble(box.getMessage()));
+				break;
+			case "fileName":
+				((PathFinderPopup)popup).emptySelection(((TextBox)c).getMessage().isEmpty());
+				break;
+			case "path":
+				((PathFinderPopup)popup).setPath(((TextBox)c).getMessage());
 				break;
 			}
 		}
@@ -362,5 +403,10 @@ public class Menu extends MenuManager implements ComponentListener{
 
 	@Override
 	public void componentHidden(ComponentEvent e) {}
+
+	public void createExitPopup() {
+		setPopup(new ConfirmationPopup("Are you sure you want to quit?",
+				"fullExit", "cancel", "PolyGrapher", font, false, true));
+	}
 
 }

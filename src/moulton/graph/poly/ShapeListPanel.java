@@ -30,9 +30,9 @@ public class ShapeListPanel extends ListPanel {
 		Button shapeUp = new Button("shapeUp:"+addHeight,"^",newShapePanel,1,0,font,Color.LIGHT_GRAY);
 		Button shapeDown = new Button("shapeDown:"+addHeight,"v",newShapePanel,2,0,font,Color.LIGHT_GRAY);
 		if(addHeight == 0)
-			shapeUp.setEditable(false);
+			shapeUp.setEnabled(false);
 		if(addHeight + 1 == max)
-			shapeDown.setEditable(false);
+			shapeDown.setEnabled(false);
 		new Button("shapeDelete:"+addHeight,"X",newShapePanel,3,0,font,Color.LIGHT_GRAY);
 		newShapePanel.getGridFormatter().specifyColumnWeight(0, 2.0);
 	}
