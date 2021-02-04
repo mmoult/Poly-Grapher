@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.comps;
 
 import java.awt.Color;
 import java.awt.Font;

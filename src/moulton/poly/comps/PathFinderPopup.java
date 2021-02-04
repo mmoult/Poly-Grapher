@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.comps;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,7 +12,7 @@ import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 
-public class PathFinderPopup extends Popup{
+public class PathFinderPopup extends Popup {
 	private TextBox pathDisplay;
 	private TextBox fileName;
 	private Button okButton;
@@ -52,6 +52,12 @@ public class PathFinderPopup extends Popup{
 		if(startFilePath == null) {
 			//load the user directory initially
 			startFilePath = new File(System.getProperty("user.home")).toString();
+		}else {
+			if(startFilePath.indexOf('.') != -1) { //the name was included
+				fileName.setMessage(startFilePath.substring(startFilePath.lastIndexOf('\\')+1));
+				okButton.setEnabled(true);
+				startFilePath = startFilePath.substring(0, startFilePath.lastIndexOf('\\'));
+			}
 		}
 		setPath(startFilePath);
 	}

@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.main;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,6 +12,13 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import moulton.poly.comps.CoordControl;
+import moulton.poly.comps.DragButton;
+import moulton.poly.comps.PathFinderPopup;
+import moulton.poly.comps.PolygonView;
+import moulton.poly.comps.ShapeListPanel;
+import moulton.poly.comps.VertexListPanel;
+import moulton.poly.utils.Shape;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.Container;
@@ -122,7 +129,7 @@ public class Menu extends MenuManager implements ComponentListener{
 			return;
 		}switch(id) {
 		case "quit":
-			((PolyGrapher)cont).running = false;
+			createExitPopup();
 			break;
 		case "save": //save all the shapes in an export friendly way
 			createPopup(false);
@@ -154,104 +161,16 @@ public class Menu extends MenuManager implements ComponentListener{
 		//Path Finder Pop up actions
 		case "doSave":
 			String toPath = ((PathFinderPopup)popup).getPath();
-			FileWriter fw = null;
-			try {
-				fw = new FileWriter(toPath);
-				if(shapes != null) {
-					for(Shape shape:shapes.getShapes()) {
-						fw.write("\""+shape.getTitle()+"\":\n");
-						String fullColor = Integer.toHexString(shape.getColor().getRGB());
-						if(fullColor.length() > 6)
-							fullColor = fullColor.substring(2);
-						fw.write(" color: 0x"+fullColor);
-						fw.write("\n vertices: {");
-						boolean start = true;
-						for(double[] vertex: shape.getVertices()) {
-							if(!start) {
-								fw.write(", ");
-							}else
-								start = false;
-							fw.write("{"+vertex[0]+", "+vertex[1]+"}");
-						}
-						fw.write("}\n");
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if(fw != null) {
-					try {
-						fw.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			new FileRepresentation().save(toPath);
 			setPopup(null);
 			//if all this worked, save this as the new file directory
-			lastFilePath = toPath.substring(0, toPath.lastIndexOf('\\'));
+			lastFilePath = toPath;
 			break;
 		case "doLoad":
 			String fromPath = ((PathFinderPopup)popup).getPath();
-			clear();
-			Scanner scan = null;
-			try {
-				scan = new Scanner(new File(fromPath));
-				while(scan.hasNextLine()) {
-					String line = scan.nextLine();
-					if(line.isEmpty())
-						continue;
-					String title = null;
-					Color color = null;
-					LinkedList<double[]> vertices = new LinkedList<>();
-					
-					if(line.indexOf("\"") != -1) { //each shape should start with a title
-						title = line.substring(line.indexOf('"')+1, line.lastIndexOf('"'));
-						line = scan.nextLine();
-						if(line.indexOf("color:") != -1) {
-							color = new Color(Integer.parseInt(line.substring(line.indexOf("0x")+2), 16));
-							line = scan.nextLine();
-						}
-					}
-					char[] opens = {'{', '[', '('};
-					char[] closes = {'}', ']', ')'};
-					for(int i=0; i<opens.length; i++) {
-						char open = opens[i];
-						if(line.indexOf(open) != -1) { //load the vertices
-							line = line.substring(line.indexOf(open) + 1); //get rid of all the beginning
-							while(line.indexOf(open) != -1) {
-								line = line.substring(line.indexOf(open) + 1);
-								double first = Double.parseDouble(line.substring(0, line.indexOf(',')));
-								line = line.substring(line.indexOf(',') + 1);
-								double second = Double.parseDouble(line.substring(0, line.indexOf(closes[i])));
-								vertices.add(new double[] {first, second});
-							}
-							break; //found successfully, so don't try the others
-						}
-					}
-					
-					//now try to create the shape
-					if(title == null)
-						title = "Shape" + shapeCount++;
-					if(color == null)
-						color = Color.BLACK;
-					double[][] verts = new double[vertices.size()][2];
-					vertices.toArray(verts);
-					shapes.addShape(new Shape(title, color, verts));
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}catch(NoSuchElementException err) { //unexpected file termination
-				err.printStackTrace();
-			}finally {
-				if(scan != null)
-					scan.close();
-			}
-			shapes.updateList();
-			if(view != null)
-				view.recenter();
+			new FileRepresentation().load(fromPath);
 			//if all this worked, save this as the new file directory
-			lastFilePath = fromPath.substring(0, fromPath.lastIndexOf('\\'));
+			lastFilePath = fromPath;
 			//fall through to cancel/quit
 		case "cancel":
 			setPopup(null);
@@ -262,8 +181,9 @@ public class Menu extends MenuManager implements ComponentListener{
 		case "directoryButton":
 			((PathFinderPopup)popup).select(((Button)c).getText().substring(2));
 			break;
+			
 		case "fullExit":
-			System.exit(0);
+			((PolyGrapher)cont).running = false;
 			break;
 		}
 	}
@@ -407,6 +327,107 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void createExitPopup() {
 		setPopup(new ConfirmationPopup("Are you sure you want to quit?",
 				"fullExit", "cancel", "PolyGrapher", font, false, true));
+	}
+	
+	//There was no good way to separate the file representation from the menu, which has all the data
+	public class FileRepresentation {
+		
+		public void save(String path) {
+			FileWriter fw = null;
+			try {
+				fw = new FileWriter(path);
+				if(shapes != null) {
+					for(Shape shape:shapes.getShapes()) {
+						fw.write("\""+shape.getTitle()+"\":\n");
+						String fullColor = Integer.toHexString(shape.getColor().getRGB());
+						if(fullColor.length() > 6)
+							fullColor = fullColor.substring(2);
+						fw.write(" color: 0x"+fullColor);
+						fw.write("\n vertices: {");
+						boolean start = true;
+						for(double[] vertex: shape.getVertices()) {
+							if(!start) {
+								fw.write(", ");
+							}else
+								start = false;
+							fw.write("{"+vertex[0]+", "+vertex[1]+"}");
+						}
+						fw.write("}\n");
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if(fw != null) {
+					try {
+						fw.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		public void load(String path) {
+			clear();
+			Scanner scan = null;
+			try {
+				scan = new Scanner(new File(path));
+				while(scan.hasNextLine()) {
+					String line = scan.nextLine();
+					if(line.isEmpty())
+						continue;
+					String title = null;
+					Color color = null;
+					LinkedList<double[]> vertices = new LinkedList<>();
+					
+					if(line.indexOf("\"") != -1) { //each shape should start with a title
+						title = line.substring(line.indexOf('"')+1, line.lastIndexOf('"'));
+						line = scan.nextLine();
+						if(line.indexOf("color:") != -1) {
+							color = new Color(Integer.parseInt(line.substring(line.indexOf("0x")+2), 16));
+							line = scan.nextLine();
+						}
+					}
+					char[] opens = {'{', '[', '('};
+					char[] closes = {'}', ']', ')'};
+					for(int i=0; i<opens.length; i++) {
+						char open = opens[i];
+						if(line.indexOf(open) != -1) { //load the vertices
+							line = line.substring(line.indexOf(open) + 1); //get rid of all the beginning
+							while(line.indexOf(open) != -1) {
+								line = line.substring(line.indexOf(open) + 1);
+								double first = Double.parseDouble(line.substring(0, line.indexOf(',')));
+								line = line.substring(line.indexOf(',') + 1);
+								double second = Double.parseDouble(line.substring(0, line.indexOf(closes[i])));
+								vertices.add(new double[] {first, second});
+							}
+							break; //found successfully, so don't try the others
+						}
+					}
+					
+					//now try to create the shape
+					if(title == null)
+						title = "Shape" + shapeCount++;
+					if(color == null)
+						color = Color.BLACK;
+					double[][] verts = new double[vertices.size()][2];
+					vertices.toArray(verts);
+					shapes.addShape(new Shape(title, color, verts));
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}catch(NoSuchElementException err) { //unexpected file termination
+				err.printStackTrace();
+			}finally {
+				if(scan != null)
+					scan.close();
+			}
+			shapes.updateList();
+			if(view != null)
+				view.recenter();
+		}
+
 	}
 
 }

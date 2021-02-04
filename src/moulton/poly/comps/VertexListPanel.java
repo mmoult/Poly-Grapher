@@ -1,8 +1,9 @@
-package moulton.graph.poly;
+package moulton.poly.comps;
 
 import java.awt.Color;
 import java.awt.Font;
 
+import moulton.poly.utils.Shape;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.ListPanel;
 import moulton.scalable.containers.Panel;

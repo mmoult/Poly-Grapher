@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.comps;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -8,6 +8,8 @@ import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.ListPanel;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.utils.GridFormatter;
+
+import moulton.poly.utils.Shape;
 
 public class ShapeListPanel extends ListPanel {
 	private Font font;

@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.comps;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -9,6 +9,8 @@ import java.util.LinkedList;
 
 import moulton.scalable.containers.Panel;
 import moulton.scalable.visuals.View;
+
+import moulton.poly.utils.Shape;
 
 public class PolygonView extends View{
 	private static final double SHOULDER_DIVISOR = 5;

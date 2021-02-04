@@ -1,4 +1,4 @@
-package moulton.graph.poly;
+package moulton.poly.utils;
 
 import java.awt.Color;
 import java.util.Arrays;
