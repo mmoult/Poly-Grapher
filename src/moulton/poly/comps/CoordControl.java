@@ -9,7 +9,7 @@ import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 import moulton.scalable.texts.TextFormat;
 
-public class CoordControl extends Panel{
+public class CoordControl extends Panel {
 	public TextBox lowX, hiX, lowY, hiY;
 
 	public CoordControl(Panel parent, String x, String y, String width, String height, Color color) {
@@ -30,13 +30,13 @@ public class CoordControl extends Panel{
 		hiY = new TextBox("hiY","0",this,2,1,font,Color.LIGHT_GRAY);
 		hiY.setTextFormat(numberForm);
 		hiY.setClickSelectsAll(true);
-		new Caption("X(",this,0,0,font,Alignment.LEFT_ALIGNMENT);
-		new Caption("Y(",this,0,1,font,Alignment.LEFT_ALIGNMENT);
-		grid.specifyColumnWeight(0, .15);
-		new Caption(")",this,"width-width/12","height/4",font,Alignment.LEFT_ALIGNMENT);
-		new Caption(")",this,"width-width/12","3height/4",font,Alignment.LEFT_ALIGNMENT);
-		new Caption(",",this,"width/1.9","height/4",font,Alignment.LEFT_ALIGNMENT);
-		new Caption(",",this,"width/1.9","3height/4",font,Alignment.LEFT_ALIGNMENT);
+		new Caption("X(",this,"8","8",font,Alignment.LEFT_ALIGNMENT);
+		new Caption("Y(",this,"8","26",font,Alignment.LEFT_ALIGNMENT);
+		grid.specifyColumnWeight(0, .01);
+		new Caption(")",this,"width-width/12","8",font,Alignment.LEFT_ALIGNMENT);
+		new Caption(")",this,"width-width/12","26",font,Alignment.LEFT_ALIGNMENT);
+		new Caption(",",this,"width/1.9","8",font,Alignment.LEFT_ALIGNMENT);
+		new Caption(",",this,"width/1.9","26",font,Alignment.LEFT_ALIGNMENT);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,18 +13,21 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+
 import moulton.poly.comps.CoordControl;
 import moulton.poly.comps.DragButton;
 import moulton.poly.comps.PathFinderPopup;
-import moulton.poly.comps.PolygonView;
-import moulton.poly.comps.ShapeListPanel;
-import moulton.poly.comps.VertexListPanel;
-import moulton.poly.utils.Shape;
+import moulton.poly.shapes.PolygonView;
+import moulton.poly.shapes.Shape;
+import moulton.poly.shapes.ShapeListPanel;
+import moulton.poly.shapes.VertexListPanel;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.Container;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
+import moulton.scalable.containers.PanelPlus;
 import moulton.scalable.containers.PartitionPanel;
 import moulton.scalable.draggables.ScrollBar;
 import moulton.scalable.popups.ConfirmationPopup;
@@ -31,17 +35,20 @@ import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 import moulton.scalable.utils.GridFormatter;
+import moulton.scalable.visuals.ImageButton;
 
 public class Menu extends MenuManager implements ComponentListener{
 	public static final int DEFAULT_WIDTH = 600;
 	private final int DRAG_BUTTON_WIDTH = 5;
+	private final int BANNER_HEIGHT = 30;
+	private final int BUTTON_BAR_HEIGHT = 40;
 	
 	private int shapeCount = 0;
 	private int windowWidth = DEFAULT_WIDTH;
-	
+	private String lastFilePath = null;
+		
 	private Font font;
-	
-	private PartitionPanel partition;
+	private PartitionPanel partition; //TODO I don't think we need to save this...
 	private Caption pageSelected;
 	private ShapeListPanel shapes;
 	private VertexListPanel vertices;
@@ -50,8 +57,11 @@ public class Menu extends MenuManager implements ComponentListener{
 	private CoordControl coordControl;
 	private PolygonView view;
 	
-	private String lastFilePath = null;
-	
+	private BufferedImage pinUp=null, pinDown = null;
+	private BufferedImage yOriDown=null, yOriUp=null;
+	private BufferedImage targetUnfocus=null, targetFocus=null;
+	private BufferedImage magIn=null, magOut=null;
+	private BufferedImage clickStar=null, clickMove=null;
 
 	public Menu(Container cont) {
 		super(cont);
@@ -60,7 +70,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	@Override
 	public void createMenu() {
 		this.menu = Panel.createRoot(null);
-		Panel banner = new Panel(menu, "0", "0", "width", "30", Color.CYAN);
+		Panel banner = new Panel(menu, "0", "0", "width", Integer.toString(BANNER_HEIGHT), Color.CYAN);
 		Font boldFont = new Font("Arial", Font.BOLD, 17);
 		font = new Font("Arial", Font.PLAIN, 12);
 		new Caption("PolyGrapher", banner, 2, 0, boldFont, Alignment.CENTER_ALIGNMENT);
@@ -73,22 +83,58 @@ public class Menu extends MenuManager implements ComponentListener{
 		format.setMargin("5", "5");
 		format.setFrame("5", "5");
 		
-		partition = new PartitionPanel(menu, "0", "30", "width", "?height", null);
+		partition = new PartitionPanel(menu, "0", Integer.toString(BANNER_HEIGHT), "width", "?height", null);
 		partition.setVerticalPartition("200");
 		controlPane = new Panel(partition, 0, 0, new Color(0xE5E5E5));
 		partition.setLeft(controlPane);
-		Panel pageBanner = new Panel(controlPane, "0", "0", "width", "20", new Color(0x9FFF));
+		Color niceBlue = new Color(0x9FFF);
+		Panel pageBanner = new Panel(controlPane, "0", "0", "width", "20", niceBlue);
 		pageSelected = new Caption("Shapes", pageBanner, 0, 0, font, Alignment.CENTER_ALIGNMENT);
 		shapes = new ShapeListPanel(controlPane, "12", "20", "?width", "?height", font, null);
 		shapes.setHeightScrollBar(new ScrollBar(true, controlPane, "0","20","12","?height",Color.LIGHT_GRAY));
 		
 		Panel viewPanel = new Panel(partition, 0, 0, Color.WHITE);
 		partition.setRight(viewPanel);
-		new DragButton(this, viewPanel, "0", "0", DRAG_BUTTON_WIDTH+"", "height", Color.LIGHT_GRAY);
-		view = new PolygonView(shapes, viewPanel, ""+DRAG_BUTTON_WIDTH,"0","?width","height");
+		String dragButtonWidth = Integer.toString(DRAG_BUTTON_WIDTH);
+		new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY);
+		String barHeight = Integer.toString(BUTTON_BAR_HEIGHT);
+		view = new PolygonView(shapes, viewPanel, dragButtonWidth,"0","?width","?height-"+barHeight);
 		
-		coordControl = new CoordControl(viewPanel, "width-width/3","height-height/10","?width","?height", 
-				new Color(100,100,100,150));
+		Color darkishGray = new Color(100,100,100,150);
+		Panel buttonBar = new Panel(viewPanel, dragButtonWidth, "height-"+barHeight, "width", "?height", darkishGray);
+		try {
+			pinUp = ImageIO.read(getClass().getResource("/pin-up.png"));
+			pinDown = ImageIO.read(getClass().getResource("/pin-down.png"));
+			yOriDown = ImageIO.read(getClass().getResource("/y-down-graph.png"));
+			yOriUp = ImageIO.read(getClass().getResource("/y-up-graph.png"));
+			targetUnfocus = ImageIO.read(getClass().getResource("/center-unfocus.png"));
+			targetFocus = ImageIO.read(getClass().getResource("/center-focus.png"));
+			magIn = ImageIO.read(getClass().getResource("/mag-in.png"));
+			magOut = ImageIO.read(getClass().getResource("/mag-out.png"));
+			clickStar = ImageIO.read(getClass().getResource("/click-star.png"));
+			clickMove = ImageIO.read(getClass().getResource("/click-move.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		new ImageButton("pinX", pinUp, buttonBar, "width-175", "0", "?width-140", "?height/2", Color.LIGHT_GRAY);
+		new ImageButton("pinY", pinUp, buttonBar, "width-175", "height/2", "?width-140", "?height", Color.LIGHT_GRAY);
+		
+		Color satBlue = new Color(0x8BC1E0);
+		PanelPlus buttonDisplay = new PanelPlus(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
+		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 4, 0, satBlue);
+		addTouchResponsiveComponent(yOrient);
+		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
+		centerImg.setTouchedImage(targetFocus);
+		addTouchResponsiveComponent(centerImg);
+		addTouchResponsiveComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
+		addTouchResponsiveComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
+		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
+		addTouchResponsiveComponent(clickType);
+		
+		Font bigFont = new Font("Arial", Font.PLAIN, 20);
+		new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue);
+		new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue);
+		coordControl = new CoordControl(buttonBar, "width-140", "0", "?width", "height", darkishGray);
 		view.setCoordControl(coordControl);
 	}
 
@@ -180,6 +226,9 @@ public class Menu extends MenuManager implements ComponentListener{
 			break;
 		case "directoryButton":
 			((PathFinderPopup)popup).select(((Button)c).getText().substring(2));
+			break;
+		case "fileName":
+			((PathFinderPopup)popup).emptySelection(false);
 			break;
 			
 		case "fullExit":
@@ -311,7 +360,8 @@ public class Menu extends MenuManager implements ComponentListener{
 		super.mouseMoved(x, y);
 		if(view != null && partition != null) {
 			int offsX = Integer.parseInt(partition.getVerticalPartition()) + DRAG_BUTTON_WIDTH;
-			view.informMouseXY(x-offsX, y-30); //30 is height of the banner
+			//TODO set flag if the y is too big
+			view.informMouseXY(x-offsX, y-BANNER_HEIGHT);
 		}
 	}
 
@@ -326,7 +376,7 @@ public class Menu extends MenuManager implements ComponentListener{
 
 	public void createExitPopup() {
 		setPopup(new ConfirmationPopup("Are you sure you want to quit?",
-				"fullExit", "cancel", "PolyGrapher", font, false, true));
+				"fullExit", "cancel", null, font, false, true));
 	}
 	
 	//There was no good way to separate the file representation from the menu, which has all the data

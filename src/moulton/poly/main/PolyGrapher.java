@@ -49,10 +49,10 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 		
 		ArrayList<Image> icons = new ArrayList<>(4);
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_24.png")));
-		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_32.png")));
-		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_48.png")));
-		icons.add(tk.getImage(getClass().getClassLoader().getResource("polygon_icon_256.png")));
+		icons.add(tk.getImage(getClass().getClassLoader().getResource("icons/polygon_icon_24.png")));
+		icons.add(tk.getImage(getClass().getClassLoader().getResource("icons/polygon_icon_32.png")));
+		icons.add(tk.getImage(getClass().getClassLoader().getResource("icons/polygon_icon_48.png")));
+		icons.add(tk.getImage(getClass().getClassLoader().getResource("icons/polygon_icon_256.png")));
 		frame.setIconImages(icons);
 		
 		frame.addWindowListener(new WindowAdapter(){
@@ -66,13 +66,23 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 	}
 	
 	private void run() {
+		//We don't have any animations except for text boxes, which refresh ~ 1/sec
+		//Therefore we don't have to force refreshes often
+		final int WAIT_MS = 800;
 		long currentTime;
 		long lastTime = System.currentTimeMillis();
 		while(running) {
 			currentTime = System.currentTimeMillis();
-			if(currentTime > 100 + lastTime) {
+			long diff = currentTime-lastTime;
+			if(diff > WAIT_MS) {
 				this.repaint();
 				lastTime = System.currentTimeMillis();
+			}else {
+				try {
+					Thread.sleep(WAIT_MS - diff);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		//any wrap up of resources
