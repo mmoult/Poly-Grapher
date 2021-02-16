@@ -11,12 +11,17 @@ import moulton.poly.comps.CoordControl;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.visuals.View;
 
-public class PolygonView extends View{
+public class PolygonView extends View {
 	private static final double SHOULDER_DIVISOR = 5;
 	private double lowX=0, lowY=0, hiX=0, hiY=0;
 	private double xScale=0, yScale=0;
 	private boolean recenter = true;
 	private int mouseX = -1, mouseY = -1;
+	
+	private boolean fixedXAxis = false;
+	private boolean fixedYAxis = false;
+	private boolean invertYAxis = false;
+	private boolean createOnClick = true;
 	
 	private CoordControl coordControl = null;
 	private ShapeListPanel shapes;
@@ -34,7 +39,7 @@ public class PolygonView extends View{
 	public void render(Graphics g, int xx, int yy, int ww, int hh) {
 		//create the image
 		Rectangle coords = this.getRenderRect(xx, yy, ww, hh, width, height);
-		this.image = new BufferedImage(coords.width, coords.height,BufferedImage.TYPE_INT_RGB);
+		this.image = new BufferedImage(coords.width, coords.height, BufferedImage.TYPE_INT_RGB);
 		Graphics g2 = image.getGraphics();
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, coords.width, coords.height);
@@ -79,23 +84,29 @@ public class PolygonView extends View{
 				hiY += yShoulder;
 				recenter = false;
 				if(coordControl != null) {
-					coordControl.hiX.setMessage(""+hiX);
-					coordControl.hiY.setMessage(""+hiY);
-					coordControl.lowX.setMessage(""+lowX);
-					coordControl.lowY.setMessage(""+lowY);
+					coordControl.hiX.setMessage(Double.toString(hiX));
+					coordControl.hiY.setMessage(Double.toString(hiY));
+					coordControl.lowX.setMessage(Double.toString(lowX));
+					coordControl.lowY.setMessage(Double.toString(lowY));
 				}
 			}
 			
 			//now we can start drawing the shapes
-			xScale = ww/(hiX-lowX);
-			yScale = hh/(hiY-lowY);
+			xScale = coords.width/(hiX-lowX);
+			yScale = coords.height/(hiY-lowY);
 			for(Shape shape:shapeList) {
 				LinkedList<double[]> vertices = shape.getVertices();
 				int[] oldVertex = null;
 				int[] firstVertex = null;
 				for(double[] vertex:vertices) {
-					int x1 = (int)((vertex[0] - lowX)*xScale);
-					int y1 = (int)((vertex[1] - lowY)*yScale);
+					int x1, y1;
+					if(!invertYAxis) {
+						x1 = (int)((vertex[0] - lowX)*xScale);
+						y1 = (int)((vertex[1] - lowY)*yScale);
+					}else {
+						x1 = (int)((vertex[0] - lowX)*xScale);
+						y1 = (int)((hiY - vertex[1])*yScale);
+					}
 					if(oldVertex != null) { //draw a line from here to the next
 						g2.setColor(shape.getColor());
 						g2.drawLine(oldVertex[0], oldVertex[1], x1, y1);
@@ -113,13 +124,17 @@ public class PolygonView extends View{
 			}
 		}
 		
-		super.render(g, coords.x, coords.y, coords.width, coords.height); //finally render the image
+		super.render(g, xx, yy, ww, hh); //finally render the image
 		
 		//write out the mouse coordinates
 		if(mouseX > -1 && mouseY > -1 && lowX!=hiX && lowY!=hiY) {
 			g.setColor(new Color(100,100,100,150)); //to the translucent gray
 			String mx = limitNumber(lowX + mouseX/xScale, 5);
-			String my = limitNumber(lowY + mouseY/yScale, 5);
+			String my;
+			if(!invertYAxis)
+				my = limitNumber(lowY + mouseY/yScale, 5);
+			else
+				my = limitNumber(hiY - mouseY/yScale, 5);
 			String mouseXY = "(" + mx + ", " + my + ")";
 			FontMetrics fm = g.getFontMetrics();
 			g.fillRect(coords.x+coords.width-fm.stringWidth(mouseXY), coords.y, fm.stringWidth(mouseXY), fm.getHeight());
@@ -190,6 +205,9 @@ public class PolygonView extends View{
 			number = "-";
 			num *= -1;
 		}
+		if(num == 0)
+			return "0";
+		
 		//build up to find how large the number is
 		int powerOfTen = 0;
 		while(num >= Math.pow(10.0, powerOfTen)) {
@@ -251,6 +269,23 @@ public class PolygonView extends View{
 			}
 		}
 		return number;
+	}
+	
+	public boolean toggleXFixed() {
+		fixedXAxis = !fixedXAxis;
+		return fixedXAxis;
+	}
+	public boolean toggleYFixed() {
+		fixedYAxis = !fixedYAxis;
+		return fixedYAxis;
+	}
+	public boolean toggleInvertYAxis() {
+		invertYAxis = !invertYAxis;
+		return invertYAxis;
+	}
+	public boolean toggleClickAction() {
+		createOnClick = !createOnClick;
+		return createOnClick;
 	}
 	
 }

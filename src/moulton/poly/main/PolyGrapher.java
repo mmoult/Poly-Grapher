@@ -99,7 +99,7 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 	
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(Menu.DEFAULT_WIDTH, 400);
+		return new Dimension(Menu.DEFAULT_WIDTH, 420);
 	}
 
 	@Override

@@ -38,7 +38,7 @@ import moulton.scalable.utils.GridFormatter;
 import moulton.scalable.visuals.ImageButton;
 
 public class Menu extends MenuManager implements ComponentListener{
-	public static final int DEFAULT_WIDTH = 600;
+	public static final int DEFAULT_WIDTH = 650;
 	private final int DRAG_BUTTON_WIDTH = 5;
 	private final int BANNER_HEIGHT = 30;
 	private final int BUTTON_BAR_HEIGHT = 40;
@@ -48,7 +48,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	private String lastFilePath = null;
 		
 	private Font font;
-	private PartitionPanel partition; //TODO I don't think we need to save this...
+	private PartitionPanel partition;
 	private Caption pageSelected;
 	private ShapeListPanel shapes;
 	private VertexListPanel vertices;
@@ -116,24 +116,68 @@ public class Menu extends MenuManager implements ComponentListener{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new ImageButton("pinX", pinUp, buttonBar, "width-175", "0", "?width-140", "?height/2", Color.LIGHT_GRAY);
-		new ImageButton("pinY", pinUp, buttonBar, "width-175", "height/2", "?width-140", "?height", Color.LIGHT_GRAY);
+		ImageButton pinX = new ImageButton("pinX", pinUp, buttonBar, "width-175", "0", "?width-140", "?height/2", Color.LIGHT_GRAY);
+		pinX.setTouchedImage(pinDown);
+		addTouchResponsiveComponent(pinX);
+		pinX.setClickAction(() -> {
+			if(view.toggleXFixed()) {
+				pinX.setTouchedImage(pinUp);
+				pinX.setImage(pinDown);
+			} else {
+				pinX.setTouchedImage(pinDown);
+				pinX.setImage(pinUp);
+			}
+			return true;
+		});
+		ImageButton pinY = new ImageButton("pinY", pinUp, buttonBar, "width-175", "height/2", "?width-140", "?height", Color.LIGHT_GRAY);
+		pinY.setTouchedImage(pinDown);
+		addTouchResponsiveComponent(pinY);
+		pinY.setClickAction(() -> {
+			if(view.toggleYFixed()) {
+				pinY.setTouchedImage(pinUp);
+				pinY.setImage(pinDown);
+			} else {
+				pinY.setTouchedImage(pinDown);
+				pinY.setImage(pinUp);
+			}
+			return true;
+		});
 		
 		Color satBlue = new Color(0x8BC1E0);
-		PanelPlus buttonDisplay = new PanelPlus(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
+		final PanelPlus buttonDisplay = new PanelPlus(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
 		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 4, 0, satBlue);
 		addTouchResponsiveComponent(yOrient);
+		yOrient.setClickAction(() -> {
+			if(view.toggleInvertYAxis())
+				yOrient.setImage(yOriUp);
+			else
+				yOrient.setImage(yOriDown);
+			return true;
+		});
 		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
 		centerImg.setTouchedImage(targetFocus);
 		addTouchResponsiveComponent(centerImg);
 		addTouchResponsiveComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
 		addTouchResponsiveComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
 		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
+		clickType.setClickAction(() -> {
+			if(view.toggleClickAction())
+				clickType.setImage(clickStar);
+			else
+				clickType.setImage(clickMove);
+			return true;
+		});
 		addTouchResponsiveComponent(clickType);
 		
 		Font bigFont = new Font("Arial", Font.PLAIN, 20);
-		new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue);
-		new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue);
+		new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue).setClickAction(() -> {
+			buttonDisplay.setXOffs(buttonDisplay.getXOffs() - 40);
+			return true;
+		});
+		new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue).setClickAction(() -> {
+			buttonDisplay.setXOffs(buttonDisplay.getXOffs() + 40);				
+			return true;
+		});
 		coordControl = new CoordControl(buttonBar, "width-140", "0", "?width", "height", darkishGray);
 		view.setCoordControl(coordControl);
 	}
@@ -360,8 +404,10 @@ public class Menu extends MenuManager implements ComponentListener{
 		super.mouseMoved(x, y);
 		if(view != null && partition != null) {
 			int offsX = Integer.parseInt(partition.getVerticalPartition()) + DRAG_BUTTON_WIDTH;
-			//TODO set flag if the y is too big
-			view.informMouseXY(x-offsX, y-BANNER_HEIGHT);
+			if(y < cont.getMenuHeight()-BUTTON_BAR_HEIGHT)
+				view.informMouseXY(x-offsX, y-BANNER_HEIGHT);
+			else
+				view.informMouseXY(0, -1); //give it fake data to avoid display
 		}
 	}
 
