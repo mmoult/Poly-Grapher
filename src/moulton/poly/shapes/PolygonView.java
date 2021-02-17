@@ -48,6 +48,7 @@ public class PolygonView extends View {
 		if(!shapeList.isEmpty()) {
 			//find the boundaries, if necessary
 			if(recenter) {
+				double lowx=this.lowX, lowy=this.lowY, hix=this.hiX, hiy=this.hiY;
 				boolean start = true;
 				for(Shape shape: shapeList) {
 					for(double[] vertex: shape.getVertices()) {
@@ -82,6 +83,15 @@ public class PolygonView extends View {
 				lowY -= yShoulder;
 				hiX += xShoulder;
 				hiY += yShoulder;
+				//if the axis is fixed, reset this values to how they were before
+				if(fixedXAxis) {
+					this.lowX = lowx;
+					this.hiX = hix;
+				}
+				if(fixedYAxis) {
+					this.lowY = lowy;
+					this.hiY = hiy;
+				}
 				recenter = false;
 				if(coordControl != null) {
 					coordControl.hiX.setMessage(Double.toString(hiX));
@@ -92,13 +102,13 @@ public class PolygonView extends View {
 			}
 			
 			//now we can start drawing the shapes
-			xScale = coords.width/(hiX-lowX);
-			yScale = coords.height/(hiY-lowY);
-			for(Shape shape:shapeList) {
+			xScale = fixedXAxis? this.xScale : coords.width/(hiX-lowX);
+			yScale = fixedYAxis? this.yScale : coords.height/(hiY-lowY);
+			for(Shape shape: shapeList) {
 				LinkedList<double[]> vertices = shape.getVertices();
 				int[] oldVertex = null;
 				int[] firstVertex = null;
-				for(double[] vertex:vertices) {
+				for(double[] vertex: vertices) {
 					int x1, y1;
 					if(!invertYAxis) {
 						x1 = (int)((vertex[0] - lowX)*xScale);

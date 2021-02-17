@@ -102,6 +102,9 @@ public class Menu extends MenuManager implements ComponentListener{
 		
 		Color darkishGray = new Color(100,100,100,150);
 		Panel buttonBar = new Panel(viewPanel, dragButtonWidth, "height-"+barHeight, "width", "?height", darkishGray);
+		coordControl = new CoordControl(buttonBar, "width-140", "0", "?width", "height", darkishGray);
+		view.setCoordControl(coordControl);
+		
 		try {
 			pinUp = ImageIO.read(getClass().getResource("/pin-up.png"));
 			pinDown = ImageIO.read(getClass().getResource("/pin-down.png"));
@@ -123,9 +126,11 @@ public class Menu extends MenuManager implements ComponentListener{
 			if(view.toggleXFixed()) {
 				pinX.setTouchedImage(pinUp);
 				pinX.setImage(pinDown);
+				coordControl.lockX(true);
 			} else {
 				pinX.setTouchedImage(pinDown);
 				pinX.setImage(pinUp);
+				coordControl.lockX(false);
 			}
 			return true;
 		});
@@ -136,9 +141,11 @@ public class Menu extends MenuManager implements ComponentListener{
 			if(view.toggleYFixed()) {
 				pinY.setTouchedImage(pinUp);
 				pinY.setImage(pinDown);
+				coordControl.lockY(true);
 			} else {
 				pinY.setTouchedImage(pinDown);
 				pinY.setImage(pinUp);
+				coordControl.lockY(false);
 			}
 			return true;
 		});
@@ -157,6 +164,10 @@ public class Menu extends MenuManager implements ComponentListener{
 		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
 		centerImg.setTouchedImage(targetFocus);
 		addTouchResponsiveComponent(centerImg);
+		centerImg.setClickAction(() -> {
+			view.recenter();
+			return true;
+		});
 		addTouchResponsiveComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
 		addTouchResponsiveComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
 		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
@@ -178,8 +189,6 @@ public class Menu extends MenuManager implements ComponentListener{
 			buttonDisplay.setXOffs(buttonDisplay.getXOffs() + 40);				
 			return true;
 		});
-		coordControl = new CoordControl(buttonBar, "width-140", "0", "?width", "height", darkishGray);
-		view.setCoordControl(coordControl);
 	}
 
 	@Override

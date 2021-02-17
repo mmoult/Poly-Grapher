@@ -38,5 +38,14 @@ public class CoordControl extends Panel {
 		new Caption(",",this,"width/1.9","8",font,Alignment.LEFT_ALIGNMENT);
 		new Caption(",",this,"width/1.9","26",font,Alignment.LEFT_ALIGNMENT);
 	}
+	
+	public void lockX(boolean shouldLock) {
+		lowX.setEnabled(!shouldLock);
+		hiX.setEnabled(!shouldLock);
+	}
+	public void lockY(boolean shouldLock) {
+		lowY.setEnabled(!shouldLock);
+		hiY.setEnabled(!shouldLock);
+	}
 
 }
