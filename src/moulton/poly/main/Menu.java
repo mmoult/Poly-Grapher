@@ -74,10 +74,10 @@ public class Menu extends MenuManager implements ComponentListener{
 		Font boldFont = new Font("Arial", Font.BOLD, 17);
 		font = new Font("Arial", Font.PLAIN, 12);
 		new Caption("PolyGrapher", banner, 2, 0, boldFont, Alignment.CENTER_ALIGNMENT);
-		new Button("quit", "Quit", banner, 0, 0, font, Color.LIGHT_GRAY);
-		new Button("clear", "Clear", banner, 1, 0, font, Color.LIGHT_GRAY);
-		new Button("save", "Save", banner, 3, 0, font, Color.LIGHT_GRAY);
-		new Button("load", "Load", banner, 4, 0, font, Color.LIGHT_GRAY);
+		addTouchResponsiveComponent(new Button("quit", "Quit", banner, 0, 0, font, Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("clear", "Clear", banner, 1, 0, font, Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("save", "Save", banner, 3, 0, font, Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("load", "Load", banner, 4, 0, font, Color.LIGHT_GRAY));
 		GridFormatter format = banner.getGridFormatter();
 		format.specifyColumnWeight(2, 4.0);
 		format.setMargin("5", "5");
@@ -96,13 +96,13 @@ public class Menu extends MenuManager implements ComponentListener{
 		Panel viewPanel = new Panel(partition, 0, 0, Color.WHITE);
 		partition.setRight(viewPanel);
 		String dragButtonWidth = Integer.toString(DRAG_BUTTON_WIDTH);
-		new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY);
+		addTouchResponsiveComponent(new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY));
 		String barHeight = Integer.toString(BUTTON_BAR_HEIGHT);
 		view = new PolygonView(shapes, viewPanel, dragButtonWidth,"0","?width","?height-"+barHeight);
 		
 		Color darkishGray = new Color(100,100,100,150);
 		Panel buttonBar = new Panel(viewPanel, dragButtonWidth, "height-"+barHeight, "width", "?height", darkishGray);
-		coordControl = new CoordControl(buttonBar, "width-140", "0", "?width", "height", darkishGray);
+		coordControl = new CoordControl(this, buttonBar, "width-140", "0", "?width", "height", darkishGray);
 		view.setCoordControl(coordControl);
 		
 		try {
@@ -177,14 +177,18 @@ public class Menu extends MenuManager implements ComponentListener{
 		addTouchResponsiveComponent(clickType);
 		
 		Font bigFont = new Font("Arial", Font.PLAIN, 20);
-		new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue).setClickAction(() -> {
+		Button bLeft = new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue);
+		bLeft.setClickAction(() -> {
 			buttonDisplay.setXOffs(buttonDisplay.getXOffs() - 40);
 			return true;
 		});
-		new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue).setClickAction(() -> {
+		addTouchResponsiveComponent(bLeft);
+		Button bRight = new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue);
+		bRight.setClickAction(() -> {
 			buttonDisplay.setXOffs(buttonDisplay.getXOffs() + 40);				
 			return true;
 		});
+		addTouchResponsiveComponent(bRight);
 	}
 
 	@Override
@@ -432,7 +436,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	@Override
 	public void mouseMoved(int x, int y) {
 		super.mouseMoved(x, y);
-		if(view != null && partition != null) {
+		if(view != null && partition != null && popup==null) {
 			int offsX = Integer.parseInt(partition.getVerticalPartition()) + DRAG_BUTTON_WIDTH;
 			if(y < cont.getMenuHeight()-BUTTON_BAR_HEIGHT)
 				view.informMouseXY(x-offsX, y-BANNER_HEIGHT);

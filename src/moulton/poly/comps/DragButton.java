@@ -1,6 +1,7 @@
 package moulton.poly.comps;
 
 import java.awt.Color;
+import java.awt.Cursor;
 
 import moulton.poly.main.Menu;
 import moulton.scalable.clickables.Button;
@@ -13,6 +14,8 @@ public class DragButton extends Button implements DraggableComponent{
 	public DragButton(Menu menu, Panel parent, String x, String y, String width, String height, Color color) {
 		super("_drag", "", parent, x, y, width, height, null, color);
 		this.menu = menu;
+		this.cursorType = Cursor.W_RESIZE_CURSOR;
+		this.colorTouched = color;
 	}
 
 	@Override

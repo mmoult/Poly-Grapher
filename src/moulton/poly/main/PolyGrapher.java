@@ -1,5 +1,6 @@
 package moulton.poly.main;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -26,13 +27,14 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 	private Menu manager = null;
 	private static final long serialVersionUID = 1L;
 	public boolean running = true;
+	private JFrame frame;
 	
 	public static void main(String args[]){
 		new PolyGrapher();
 	}
 	
 	public PolyGrapher(){
-		JFrame frame = new JFrame("PolyGrapher");
+		frame = new JFrame("PolyGrapher");
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.add(this);
 		manager = new Menu(this);
@@ -178,6 +180,14 @@ public class PolyGrapher extends JPanel implements Container, MouseListener, Key
 			manager.mouseScrolled(e.getX(), e.getY(), e.getWheelRotation());
 			repaint();
 		}
+	}
+
+	@Override
+	public void setCursor(int cursorType) {
+		Cursor curs = frame.getCursor();
+		int type = curs.getType();
+		if(cursorType != type)
+			frame.setCursor(Cursor.getPredefinedCursor(cursorType));
 	}
 
 }
