@@ -18,7 +18,7 @@ public class CoordControl extends Panel {
 		grid.setMargin("width/20", "height/10");
 		Font font = new Font("Arial", Font.PLAIN, 12);
 		TextFormat numberForm = new NumberFormat();
-		lowX = new TextBox("lowX","0",this,1,0,font,Color.LIGHT_GRAY);
+		lowX = new TextBox("lowX","-1.0",this,1,0,font,Color.LIGHT_GRAY);
 		lowX.setTextFormat(numberForm);
 		lowX.setClickSelectsAll(true);
 		hiX = new TextBox("hiX","0",this,2,0,font,Color.LIGHT_GRAY);

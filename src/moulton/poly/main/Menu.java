@@ -164,10 +164,6 @@ public class Menu extends MenuManager implements ComponentListener{
 		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
 		centerImg.setTouchedImage(targetFocus);
 		addTouchResponsiveComponent(centerImg);
-		centerImg.setClickAction(() -> {
-			view.recenter();
-			return true;
-		});
 		addTouchResponsiveComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
 		addTouchResponsiveComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
 		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
@@ -255,6 +251,31 @@ public class Menu extends MenuManager implements ComponentListener{
 		case "newVertex":
 			vertices.addVertex(new double[] {0,0});
 			view.recenter();
+			break;
+		case "centerImg":
+			view.recenter();
+			break;
+		case "zoomOut":
+			double[] viewCoords = view.getPerspective();
+			//so we want to show 1.5 the width and the height as before, but centered same
+			//that means that each side needs to grow .25
+			double width = viewCoords[2]-viewCoords[0];
+			double height = viewCoords[3]-viewCoords[1];
+			view.setLowX(viewCoords[0] - width/4);
+			view.setHighX(viewCoords[2] + width/4);
+			view.setLowY(viewCoords[1] - height/4);
+			view.setHighY(viewCoords[3] + height/4);
+			break;
+		case "zoomIn":
+			viewCoords = view.getPerspective();
+			//we are going to show 2/3 the width and height as before, but centered same
+			//that means each side needs to shrink 1/6
+			width = viewCoords[2]-viewCoords[0];
+			height = viewCoords[3]-viewCoords[1];
+			view.setLowX(viewCoords[0] + width/6);
+			view.setHighX(viewCoords[2] - width/6);
+			view.setLowY(viewCoords[1] + height/6);
+			view.setHighY(viewCoords[3] - height/6);
 			break;
 		
 		//Path Finder Pop up actions

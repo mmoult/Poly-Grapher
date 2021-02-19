@@ -13,7 +13,7 @@ import moulton.scalable.visuals.View;
 
 public class PolygonView extends View {
 	private static final double SHOULDER_DIVISOR = 5;
-	private double lowX=0, lowY=0, hiX=0, hiY=0;
+	private double lowX=-1, lowY=-1, hiX=1, hiY=1;
 	private double xScale=0, yScale=0;
 	private boolean recenter = true;
 	private int mouseX = -1, mouseY = -1;
@@ -33,6 +33,12 @@ public class PolygonView extends View {
 	
 	public void setCoordControl(CoordControl cc) {
 		this.coordControl = cc;
+		if(coordControl != null) {
+			coordControl.hiX.setMessage(Double.toString(hiX));
+			coordControl.hiY.setMessage(Double.toString(hiY));
+			coordControl.lowX.setMessage(Double.toString(lowX));
+			coordControl.lowY.setMessage(Double.toString(lowY));
+		}
 	}
 	
 	@Override
@@ -138,6 +144,11 @@ public class PolygonView extends View {
 		
 		//write out the mouse coordinates
 		if(mouseX > -1 && mouseY > -1 && lowX!=hiX && lowY!=hiY) {
+			if(xScale == 0)
+				xScale = coords.width/(hiX-lowX);
+			if(yScale == 0)
+				yScale = coords.height/(hiY-lowY);
+			
 			g.setColor(new Color(100,100,100,150)); //to the translucent gray
 			String mx = limitNumber(lowX + mouseX/xScale, 5);
 			String my;
@@ -168,15 +179,23 @@ public class PolygonView extends View {
 	
 	public void setLowX(double lowX) {
 		this.lowX = lowX;
+		if(coordControl != null)
+			coordControl.lowX.setMessage(Double.toString(lowX));
 	}
 	public void setLowY(double lowY) {
 		this.lowY = lowY;
+		if(coordControl != null)
+			coordControl.lowY.setMessage(Double.toString(lowY));
 	}
 	public void setHighX(double highX) {
 		hiX = highX;
+		if(coordControl != null)
+			coordControl.hiX.setMessage(Double.toString(hiX));
 	}
 	public void setHighY(double highY) {
 		hiY = highY;
+		if(coordControl != null)
+			coordControl.hiY.setMessage(Double.toString(hiY));
 	}
 	
 	private String limitNumber(double value, int chars) {
@@ -217,6 +236,8 @@ public class PolygonView extends View {
 		}
 		if(num == 0)
 			return "0";
+		if(num == Double.POSITIVE_INFINITY)
+			return (number + "infinity");
 		
 		//build up to find how large the number is
 		int powerOfTen = 0;
@@ -296,6 +317,10 @@ public class PolygonView extends View {
 	public boolean toggleClickAction() {
 		createOnClick = !createOnClick;
 		return createOnClick;
+	}
+	
+	public double[] getPerspective() {
+		return new double[]{lowX, lowY, hiX, hiY};
 	}
 	
 }
