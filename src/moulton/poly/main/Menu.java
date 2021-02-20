@@ -90,7 +90,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		Color niceBlue = new Color(0x9FFF);
 		Panel pageBanner = new Panel(controlPane, "0", "0", "width", "20", niceBlue);
 		pageSelected = new Caption("Shapes", pageBanner, 0, 0, font, Alignment.CENTER_ALIGNMENT);
-		shapes = new ShapeListPanel(controlPane, "12", "20", "?width", "?height", font, null);
+		shapes = new ShapeListPanel(this, controlPane, "12", "20", "?width", "?height", font, null);
 		shapes.setHeightScrollBar(new ScrollBar(true, controlPane, "0","20","12","?height",Color.LIGHT_GRAY));
 		
 		Panel viewPanel = new Panel(partition, 0, 0, Color.WHITE);
@@ -378,6 +378,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	private void createEditPage(Shape selected) { //should take a parameter of a shape to edit
 		pageSelected.setText("Edit");
 		controlPane.removeFreeComponent(shapes);
+		shapes.clearTouchList();
 		//create the edit page from the shape. If shape is null, create a new one
 		boolean defaultShape = false;
 		if(selected == null) { //create the default shape
@@ -386,22 +387,26 @@ public class Menu extends MenuManager implements ComponentListener{
 			defaultShape = true;
 		}
 		
-		vertices = new VertexListPanel(selected, controlPane, "12", "20", "?width", "height-40", font, null, defaultShape);
+		vertices = new VertexListPanel(this, selected, controlPane, "12", "20", "?width", "height-40", font, null, defaultShape);
 		vertices.setHeightScrollBar(shapes.getHeightScrollBar());
 		
 		shapeOptions = new Panel(controlPane, "12", "height-20", "?width", "?height", null);
-		new Button("saveShape","Save",shapeOptions,0,0,font,Color.LIGHT_GRAY);
-		new Button("cancelShape", "Cancel",shapeOptions,1,0,font,Color.LIGHT_GRAY);
+		addTouchResponsiveComponent(new Button("saveShape","Save",shapeOptions,0,0,font,Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("cancelShape", "Cancel",shapeOptions,1,0,font,Color.LIGHT_GRAY));
 		shapeOptions.getGridFormatter().setMargin("width/10", null);
 	}
 	
 	private void returnToShapeList() {
 		//remove shapes panel if already in
 		controlPane.removeFreeComponent(shapes);
+		if(vertices != null)
+			vertices.removeTouchResponsiveness(this);
 		
 		pageSelected.setText("Shapes");
 		controlPane.removeFreeComponent(vertices);
 		controlPane.removeFreeComponent(shapeOptions);
+		removeTouchResponsiveComponent((Button)findComponent("saveShape", shapeOptions));
+		removeTouchResponsiveComponent(findComponent("cancelShape", shapeOptions));
 		shapes.setHeightScrollBar(shapes.getHeightScrollBar());
 		controlPane.addFreeComponent(shapes);
 		shapes.updateList();

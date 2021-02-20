@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import moulton.poly.comps.NumberFormat;
+import moulton.poly.main.Menu;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.ListPanel;
 import moulton.scalable.containers.Panel;
@@ -18,12 +19,16 @@ public class VertexListPanel extends ListPanel {
 	private Shape shape; //the shape presently
 	private Shape oldShape; //the shape when this was first created
 	private Font font = new Font("Arial", Font.PLAIN, 12);
+	private Menu menu;
 
-	public VertexListPanel(Shape shape, Panel parent, String x, String y, String shownWidth, String shownHeight, Font font, Color color, boolean defaultShape) {
+	public VertexListPanel(Menu menu, Shape shape, Panel parent, String x, String y, String shownWidth, String shownHeight, Font font, Color color, boolean defaultShape) {
 		super("25", parent, x, y, shownWidth, shownHeight, "0", color);
+		this.menu = menu;
 		Panel titlePanel = new Panel(this, 0, 0, null);
 		new Caption("Title:",titlePanel,0,0,font,Alignment.LEFT_ALIGNMENT);
-		new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY).setClickSelectsAll(true);
+		TextBox titleBox = new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY);
+		titleBox.setClickSelectsAll(true);
+		menu.addTouchResponsiveComponent(titleBox);
 		Panel colorPanel = new Panel(this, 0, 1, null);
 		new Caption("Color:",colorPanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		String fullColor = ""+Integer.toHexString(shape.getColor().getRGB());
@@ -39,7 +44,8 @@ public class VertexListPanel extends ListPanel {
 			}
 		});
 		colorBox.setClickSelectsAll(true);
-		new Button("newVertex", "New Vertex", this, 0, 2, font, Color.RED);
+		menu.addTouchResponsiveComponent(colorBox);
+		menu.addTouchResponsiveComponent(new Button("newVertex", "New Vertex", this, 0, 2, font, Color.RED));
 		this.shape = shape;
 		this.oldShape = defaultShape? null:shape.clone(); //save the way things are now if the user cancels the edit
 		updateVertices();
@@ -65,6 +71,9 @@ public class VertexListPanel extends ListPanel {
 		Button deleteVertex = new Button("deleteVertex:"+vertexNum,"X",newVertex,4,0,font,Color.LIGHT_GRAY);
 		Button vertDown = new Button("vertexDown:"+vertexNum,"v",newVertex,3,0,font,Color.LIGHT_GRAY);
 		Button vertUp = new Button("vertexUp:"+vertexNum, "^",newVertex,2,0,font,Color.LIGHT_GRAY);
+		menu.addTouchResponsiveComponent(deleteVertex);
+		menu.addTouchResponsiveComponent(vertDown);
+		menu.addTouchResponsiveComponent(vertUp);
 		if(addHeight == 2) {
 			vertUp.setEnabled(false);
 			deleteVertex.setEnabled(false);
@@ -79,10 +88,12 @@ public class VertexListPanel extends ListPanel {
 		TextBox vertexX = new TextBox("vertexX:"+vertexNum,""+toAdd[0],newVertex,"5","0","2width/7-10","height",font,Color.LIGHT_GRAY);
 		vertexX.setTextFormat(numberFormat);
 		vertexX.setClickSelectsAll(true);
+		menu.addTouchResponsiveComponent(vertexX);
 		new Caption(",",newVertex, "2width/7-5","height/2",font,Alignment.CENTER_ALIGNMENT);
 		TextBox vertexY = new TextBox("vertexY:"+vertexNum,""+toAdd[1],newVertex,"2width/7","0","2width/7-10", "height", font,Color.LIGHT_GRAY);
 		vertexY.setTextFormat(numberFormat);
 		vertexY.setClickSelectsAll(true);
+		menu.addTouchResponsiveComponent(vertexY);
 	}
 
 	public void addVertex(double[] toAdd) {
@@ -123,8 +134,11 @@ public class VertexListPanel extends ListPanel {
 	
 	private void updateVertices() {
 		//remove all the vertices from the GUI, then add back in the ones we need
-		while(this.grid.getGridHeight() > 3)
+		while(this.grid.getGridHeight() > 3) {
+			Panel vertexPanel = (Panel)grid.getAt(0, 2);
+			vertexPanel.removeTouchResponsiveness(menu);
 			this.removeComponent(2, true);
+		}
 		
 		//for each vertex in vertex list
 		for(double[] vertex: shape.getVertices())
