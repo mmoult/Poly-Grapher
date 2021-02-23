@@ -8,15 +8,19 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 import moulton.poly.comps.CoordControl;
+import moulton.poly.main.Menu;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.visuals.View;
+import moulton.scalable.draggables.DraggableComponent;
+import moulton.scalable.visuals.ImageButton;
 
-public class PolygonView extends View {
+public class PolygonView extends ImageButton implements DraggableComponent {
 	private static final double SHOULDER_DIVISOR = 5;
 	private double lowX=-1, lowY=-1, hiX=1, hiY=1;
 	private double xScale=0, yScale=0;
-	private boolean recenter = true;
+	private boolean recenter = false;
 	private int mouseX = -1, mouseY = -1;
+	private String mx, my;
+	private double[] selected = null;
 	
 	private boolean fixedXAxis = false;
 	private boolean fixedYAxis = false;
@@ -26,9 +30,19 @@ public class PolygonView extends View {
 	private CoordControl coordControl = null;
 	private ShapeListPanel shapes;
 
-	public PolygonView(ShapeListPanel shapes, Panel parent, String x, String y, String w, String h) {
-		super(null, parent, x, y, w, h);
+	public PolygonView(Menu menu, ShapeListPanel shapes, Panel parent, String x, String y, String w, String h) {
+		super("", null, parent, x, y, w, h, Color.WHITE);
 		this.shapes = shapes;
+		
+		clickAction = () -> {
+			if(createOnClick) {
+				//use the menu here. Having the shape list is nice, but insufficient. 
+				//  we need to know whether the shape list is up or the vertex list, and act accordingly.
+				//	only menu would know that.
+				menu.createVertexAt(Double.parseDouble(mx), Double.parseDouble(my));
+			}
+			return true;
+		};
 	}
 	
 	public void setCoordControl(CoordControl cc) {
@@ -98,7 +112,6 @@ public class PolygonView extends View {
 					this.lowY = lowy;
 					this.hiY = hiy;
 				}
-				recenter = false;
 				if(coordControl != null) {
 					coordControl.hiX.setMessage(Double.toString(hiX));
 					coordControl.hiY.setMessage(Double.toString(hiY));
@@ -138,7 +151,15 @@ public class PolygonView extends View {
 					g2.drawLine(oldVertex[0], oldVertex[1], firstVertex[0], firstVertex[1]);
 				}
 			}
+			//draw the selected
+			if(selected != null) {
+				g2.setColor(Color.BLACK);
+				int sx = (int)((selected[0] - lowX)*xScale);
+				int sy = !invertYAxis? ((int)((selected[1] - lowY)*yScale)): ((int)((hiY - selected[1])*yScale));
+				g2.drawOval(sx-5, sy-5, 10, 10);
+			}
 		}
+		recenter = false;
 		
 		super.render(g, xx, yy, ww, hh); //finally render the image
 		
@@ -150,8 +171,7 @@ public class PolygonView extends View {
 				yScale = coords.height/(hiY-lowY);
 			
 			g.setColor(new Color(100,100,100,150)); //to the translucent gray
-			String mx = limitNumber(lowX + mouseX/xScale, 5);
-			String my;
+			mx = limitNumber(lowX + mouseX/xScale, 5);
 			if(!invertYAxis)
 				my = limitNumber(lowY + mouseY/yScale, 5);
 			else
@@ -321,6 +341,31 @@ public class PolygonView extends View {
 	
 	public double[] getPerspective() {
 		return new double[]{lowX, lowY, hiX, hiY};
+	}
+
+	@Override
+	public double[] drag(double dx, double dy) {
+		if(!createOnClick) {
+			if(xScale != 0 && !fixedXAxis) {
+				double change = dx/xScale;
+				setLowX(lowX - change);
+				setHighX(hiX - change);
+			}
+			if(yScale != 0 && !fixedYAxis) {
+				double change = dy/yScale * (invertYAxis?-1:1);
+				setLowY(lowY - change);
+				setHighY(hiY - change);
+			}
+			return new double[] {dx, dy};
+		}
+		return new double[2];
+	}
+	
+	public void select(double x, double y) {
+		selected = new double[] {x, y};
+	}
+	public void deselect() {
+		selected = null;
 	}
 	
 }

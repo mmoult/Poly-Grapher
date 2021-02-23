@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import moulton.poly.comps.NumberFormat;
+import moulton.poly.comps.TouchPanel;
 import moulton.poly.main.Menu;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.ListPanel;
@@ -67,7 +68,7 @@ public class VertexListPanel extends ListPanel {
 				}
 			}
 		}
-		Panel newVertex = new Panel(this, 0, addHeight, null);
+		TouchPanel newVertex = new TouchPanel(this, 0, addHeight, null);
 		Button deleteVertex = new Button("deleteVertex:"+vertexNum,"X",newVertex,4,0,font,Color.LIGHT_GRAY);
 		Button vertDown = new Button("vertexDown:"+vertexNum,"v",newVertex,3,0,font,Color.LIGHT_GRAY);
 		Button vertUp = new Button("vertexUp:"+vertexNum, "^",newVertex,2,0,font,Color.LIGHT_GRAY);
@@ -94,6 +95,15 @@ public class VertexListPanel extends ListPanel {
 		vertexY.setTextFormat(numberFormat);
 		vertexY.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(vertexY);
+		
+		menu.addTouchResponsiveComponent(newVertex);
+		newVertex.setTouchAction(() -> {
+			if(newVertex.isTouched())
+				menu.getPolyView().select(Double.parseDouble(vertexX.getMessage()), Double.parseDouble(vertexY.getMessage()));
+			else
+				menu.getPolyView().deselect();
+			return true;
+		});
 	}
 
 	public void addVertex(double[] toAdd) {

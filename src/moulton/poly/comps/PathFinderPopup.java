@@ -33,11 +33,15 @@ public class PathFinderPopup extends Popup {
 		smallFont = new Font("Arial", Font.PLAIN, 12);
 		pathDisplay = new TextBox("path", "", base, "25", "30", "?width", "20", smallFont, Color.WHITE);
 		pathDisplay.setOutline(true);
+		addTouchResponsiveComponent(pathDisplay);
+		pathDisplay.setTouchedColor(Color.WHITE);
 		
 		addTouchResponsiveComponent(new Button("pathUp","^",base, "0","30","20","20",font,Color.LIGHT_GRAY));
 		fileName = new TextBox("fileName","",base,"5","height-25","width*.75-5","20",font,Color.WHITE);
 		fileName.setOutline(true);
 		fileName.setHint("file name");
+		addTouchResponsiveComponent(fileName);
+		fileName.setTouchedColor(Color.WHITE);
 		okButton = new Button(load?"doLoad":"doSave","Ok",base,"width*.75+5","height-25","width*.25-10","20",font,Color.LIGHT_GRAY);
 		okButton.setEnabled(false);
 		addTouchResponsiveComponent(okButton);
@@ -47,6 +51,7 @@ public class PathFinderPopup extends Popup {
 		contentBar = new ScrollBar(true, base, "width-20","55","20","height-85",Color.LIGHT_GRAY);
 		contentBar.setScrollRate(2);
 		contents.setHeightScrollBar(contentBar);
+		addTouchResponsiveComponent(contentBar);
 		
 		//load the given directory unless null
 		if(startFilePath == null) {

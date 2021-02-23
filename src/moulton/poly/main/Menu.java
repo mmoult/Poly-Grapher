@@ -98,7 +98,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		String dragButtonWidth = Integer.toString(DRAG_BUTTON_WIDTH);
 		addTouchResponsiveComponent(new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY));
 		String barHeight = Integer.toString(BUTTON_BAR_HEIGHT);
-		view = new PolygonView(shapes, viewPanel, dragButtonWidth,"0","?width","?height-"+barHeight);
+		view = new PolygonView(this, shapes, viewPanel, dragButtonWidth,"0","?width","?height-"+barHeight);
 		
 		Color darkishGray = new Color(100,100,100,150);
 		Panel buttonBar = new Panel(viewPanel, dragButtonWidth, "height-"+barHeight, "width", "?height", darkishGray);
@@ -250,7 +250,7 @@ public class Menu extends MenuManager implements ComponentListener{
 			if(!vertices.cancel()) //if vertices could not cancel, the shape needs to be deleted
 				shapes.removeShape(vertices.getShape());
 			returnToShapeList();
-			view.recenter();
+			//TODO revert to the previous view, not just a recenter
 			break;
 		case "newVertex":
 			vertices.addVertex(new double[] {0,0});
@@ -325,6 +325,11 @@ public class Menu extends MenuManager implements ComponentListener{
 		shapes.clear();
 		shapeCount = 0;
 		shapes.updateList();
+		//also refresh the perspective back to (-1, 1)
+		view.setLowX(-1);
+		view.setHighX(1);
+		view.setLowY(-1);
+		view.setHighY(1);
 	}
 
 	@Override
@@ -449,6 +454,16 @@ public class Menu extends MenuManager implements ComponentListener{
 				view.informMouseXY(0, -1); //give it fake data to avoid display
 		}
 	}
+	
+	public void createVertexAt(double x, double y) {
+		//check if the edit page is up. If not, create a new shape, thus pulling it up
+		if(pageSelected.getText().equals("Shapes")) {
+			createEditPage(null);
+			vertices.removeVertex(0); //remove the default (0,0) point
+		}
+		//now we need to add the new vertex
+		vertices.addVertex(new double[] {x, y});
+	}
 
 	@Override
 	public void componentMoved(ComponentEvent e) {}
@@ -462,6 +477,10 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void createExitPopup() {
 		setPopup(new ConfirmationPopup("Are you sure you want to quit?",
 				"fullExit", "cancel", null, font, false, true));
+	}
+	
+	public PolygonView getPolyView() {
+		return view;
 	}
 	
 	//There was no good way to separate the file representation from the menu, which has all the data
@@ -564,5 +583,4 @@ public class Menu extends MenuManager implements ComponentListener{
 		}
 
 	}
-
 }
