@@ -22,8 +22,6 @@ import javax.swing.JPanel;
 import moulton.scalable.containers.Container;
 
 public class PolyGrapher extends JPanel implements Container, MouseListener, KeyListener, MouseMotionListener, MouseWheelListener{
-	//Re-positioning, saving, loading, deleting vertices
-	//figure out tabs for vertices maybe? Or I could just make an enter chain
 	private Menu manager = null;
 	private static final long serialVersionUID = 1L;
 	public boolean running = true;

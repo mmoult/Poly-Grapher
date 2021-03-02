@@ -27,7 +27,7 @@ import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.Container;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.containers.PanelPlus;
+import moulton.scalable.containers.VirtualPanel;
 import moulton.scalable.containers.PartitionPanel;
 import moulton.scalable.draggables.ScrollBar;
 import moulton.scalable.popups.ConfirmationPopup;
@@ -55,6 +55,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	private Panel controlPane;
 	private Panel shapeOptions;
 	private CoordControl coordControl;
+	private double[] perspective = null;
 	private PolygonView view;
 	
 	private BufferedImage pinUp=null, pinDown = null;
@@ -151,7 +152,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		});
 		
 		Color satBlue = new Color(0x8BC1E0);
-		final PanelPlus buttonDisplay = new PanelPlus(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
+		final VirtualPanel buttonDisplay = new VirtualPanel(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
 		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 4, 0, satBlue);
 		addTouchResponsiveComponent(yOrient);
 		yOrient.setClickAction(() -> {
@@ -202,6 +203,7 @@ public class Menu extends MenuManager implements ComponentListener{
 			int num = Integer.parseInt(id.substring(12));
 			shapes.removeShape(shapes.getShape(num));
 			shapes.updateList();
+			view.recenter();
 			return;
 		}if(id.length() > 8 && id.substring(0, 8).equals("shapeUp:")) {
 			int num = Integer.parseInt(id.substring(8));
@@ -216,6 +218,8 @@ public class Menu extends MenuManager implements ComponentListener{
 		}if(id.length() > 13 && id.substring(0, 13).equals("deleteVertex:")) {
 			int num = Integer.parseInt(id.substring(13));
 			vertices.removeVertex(num);
+			view.recenter();
+			view.deselect();
 			return;
 		}
 		if(id.length() > 11 && id.substring(0, 11).equals("vertexDown:")) {
@@ -245,12 +249,19 @@ public class Menu extends MenuManager implements ComponentListener{
 			break;
 		case "saveShape": //it should already be saved, we just return
 			returnToShapeList();
+			view.recenter();
 			break;
 		case "cancelShape":
 			if(!vertices.cancel()) //if vertices could not cancel, the shape needs to be deleted
 				shapes.removeShape(vertices.getShape());
 			returnToShapeList();
-			//TODO revert to the previous view, not just a recenter
+			//revert back to previous perspective
+			if(perspective != null) {
+				view.setLowX(perspective[0]);
+				view.setLowY(perspective[1]);
+				view.setHighX(perspective[2]);
+				view.setHighY(perspective[3]);
+			}
 			break;
 		case "newVertex":
 			vertices.addVertex(new double[] {0,0});
@@ -384,6 +395,11 @@ public class Menu extends MenuManager implements ComponentListener{
 		pageSelected.setText("Edit");
 		controlPane.removeFreeComponent(shapes);
 		shapes.clearTouchList();
+		
+		//save the current perspective in case of a cancel
+		perspective = view.getPerspective();
+		
+		
 		//create the edit page from the shape. If shape is null, create a new one
 		boolean defaultShape = false;
 		if(selected == null) { //create the default shape

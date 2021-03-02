@@ -1,6 +1,7 @@
 package moulton.poly.comps;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -66,7 +67,7 @@ public class TouchPanel extends Panel implements TouchResponsiveComponent {
 
 	@Override
 	public int getTouchedCursorType() {
-		return 0;
+		return Cursor.DEFAULT_CURSOR;
 	}
 	
 	@Override

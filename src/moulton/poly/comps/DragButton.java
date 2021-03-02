@@ -14,7 +14,6 @@ public class DragButton extends Button implements DraggableComponent{
 	public DragButton(Menu menu, Panel parent, String x, String y, String width, String height, Color color) {
 		super("_drag", "", parent, x, y, width, height, null, color);
 		this.menu = menu;
-		this.cursorType = Cursor.W_RESIZE_CURSOR;
 		this.colorTouched = color;
 	}
 
@@ -22,6 +21,11 @@ public class DragButton extends Button implements DraggableComponent{
 	public double[] drag(double dx, double dy) {
 		dx = menu.movePartition(dx);
 		return new double[]{dx, dy};
+	}
+	
+	@Override
+	public int getTouchedCursorType() {
+		return Cursor.W_RESIZE_CURSOR;
 	}
 
 }

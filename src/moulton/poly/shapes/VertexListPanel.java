@@ -58,28 +58,37 @@ public class VertexListPanel extends ListPanel {
 		//tell the previous vertex, if any, that its down button should be editable
 		if(vertexNum > 0) {
 			Panel p = (Panel)grid.getAt(0, addHeight-1);
+			boolean foundDown= false;
+			boolean foundDelete = vertexNum!=2; //if it is equal to two, we have to set delete for the first
 			for(MenuComponent mc:p.getAllHeldComponents()) {
 				if(mc instanceof Button) {
 					Button b = (Button) mc;
 					if(b.getId().length()>11 && b.getId().substring(0, 11).equals("vertexDown:")) {
 						b.setEnabled(true);
-						break;
+						foundDown = true;
+					}else if(b.getId().length()>13 && b.getId().subSequence(0, 13).equals("deleteVertex:")) {
+						b.setEnabled(true);
+						foundDelete = true;
 					}
+					if(foundDown && foundDelete)
+						break;
 				}
 			}
 		}
 		TouchPanel newVertex = new TouchPanel(this, 0, addHeight, null);
+		menu.addTouchResponsiveComponent(newVertex);
 		Button deleteVertex = new Button("deleteVertex:"+vertexNum,"X",newVertex,4,0,font,Color.LIGHT_GRAY);
 		Button vertDown = new Button("vertexDown:"+vertexNum,"v",newVertex,3,0,font,Color.LIGHT_GRAY);
 		Button vertUp = new Button("vertexUp:"+vertexNum, "^",newVertex,2,0,font,Color.LIGHT_GRAY);
 		menu.addTouchResponsiveComponent(deleteVertex);
 		menu.addTouchResponsiveComponent(vertDown);
 		menu.addTouchResponsiveComponent(vertUp);
-		if(addHeight == 2) {
+		if(addHeight == 2)
 			vertUp.setEnabled(false);
-			deleteVertex.setEnabled(false);
-		}if(addHeight + 1 == max)
+		if(addHeight + 1 == max)
 			vertDown.setEnabled(false);
+		if(addHeight == 2 && max < 4)
+			deleteVertex.setEnabled(false);
 		GridFormatter format = newVertex.getGridFormatter();
 		format.specifyColumnWeight(0, 2.0);
 		format.specifyColumnWeight(1, 2.0);
@@ -96,7 +105,6 @@ public class VertexListPanel extends ListPanel {
 		vertexY.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(vertexY);
 		
-		menu.addTouchResponsiveComponent(newVertex);
 		newVertex.setTouchAction(() -> {
 			if(newVertex.isTouched())
 				menu.getPolyView().select(Double.parseDouble(vertexX.getMessage()), Double.parseDouble(vertexY.getMessage()));

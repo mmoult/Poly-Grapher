@@ -198,24 +198,32 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 	}
 	
 	public void setLowX(double lowX) {
-		this.lowX = lowX;
-		if(coordControl != null)
-			coordControl.lowX.setMessage(Double.toString(lowX));
+		if(!fixedXAxis) {
+			this.lowX = lowX;
+			if(coordControl != null)
+				coordControl.lowX.setMessage(Double.toString(lowX));			
+		}
 	}
 	public void setLowY(double lowY) {
-		this.lowY = lowY;
-		if(coordControl != null)
-			coordControl.lowY.setMessage(Double.toString(lowY));
+		if(!fixedYAxis) {
+			this.lowY = lowY;
+			if(coordControl != null)
+				coordControl.lowY.setMessage(Double.toString(lowY));
+		}
 	}
 	public void setHighX(double highX) {
-		hiX = highX;
-		if(coordControl != null)
-			coordControl.hiX.setMessage(Double.toString(hiX));
+		if(!fixedXAxis) {
+			hiX = highX;
+			if(coordControl != null)
+				coordControl.hiX.setMessage(Double.toString(hiX));
+		}
 	}
 	public void setHighY(double highY) {
-		hiY = highY;
-		if(coordControl != null)
-			coordControl.hiY.setMessage(Double.toString(hiY));
+		if(!fixedYAxis) {
+			hiY = highY;
+			if(coordControl != null)
+				coordControl.hiY.setMessage(Double.toString(hiY));
+		}
 	}
 	
 	private String limitNumber(double value, int chars) {
