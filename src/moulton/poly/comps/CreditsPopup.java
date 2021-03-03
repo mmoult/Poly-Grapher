@@ -15,13 +15,15 @@ import moulton.scalable.texts.StaticTextBox;
 
 public class CreditsPopup extends Popup {
 	private String creditText =
-			"https://github.com/mmoult/Poly-Grapher\n"
+			"PolyGrapher version 1.0\n"
+			+ "https://github.com/mmoult/Poly-Grapher\n"
 			+ "\n"
 			+ "Project Lead: Matthew Moulton\n"
 			+ "Project Design: Matthew Moulton\n"
 			+ "GUI Format: Matthew Moulton\n"
 			+ "Images: Matthew Moulton\n"
 			+ "Git Maintainance: Matthew Moulton\n"
+			+ "Testing: Matthew Moulton\n"
 			+ "\n"
 			+ "Made with Moulton Scalable Menus version 1.13\n"
 			+ "© 2021- Moulton. All Rights Reserved";
@@ -37,7 +39,7 @@ public class CreditsPopup extends Popup {
 		int fontHeight = fm.getHeight();
 		int doubleHeight = fontHeight * 2;
 		
-		String title = "  PolyGrapher Credits";
+		String title = "  Credits";
 		new Caption(title,base,"0",""+fm.getHeight(), font, Alignment.LEFT_ALIGNMENT);
 		new Line(base, "1",""+(doubleHeight-1), "width-2", "?", Color.GRAY);
 		

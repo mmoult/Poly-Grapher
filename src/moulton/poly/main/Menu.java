@@ -352,11 +352,15 @@ public class Menu extends MenuManager implements ComponentListener{
 			if(id.length() > 8 && id.substring(0, 8).equals("vertexX:")) {
 				int num = Integer.parseInt(id.substring(8));
 				vertices.getVertex(num)[0] = Double.parseDouble(box.getMessage());
+				vertices.updatePerimeter();
+				view.select(vertices.getVertex(num));
 				view.recenter();
 				return;
 			}if(id.length() > 8 && id.substring(0, 8).equals("vertexY:")) {
 				int num = Integer.parseInt(id.substring(8));
 				vertices.getVertex(num)[1] = Double.parseDouble(box.getMessage());
+				vertices.updatePerimeter();
+				view.select(vertices.getVertex(num));
 				view.recenter();
 				return;
 			}

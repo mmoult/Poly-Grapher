@@ -12,16 +12,20 @@ import moulton.scalable.containers.ListPanel;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
+import moulton.scalable.texts.StaticTextBox;
 import moulton.scalable.texts.TextBox;
 import moulton.scalable.texts.TextFormat;
 import moulton.scalable.utils.GridFormatter;
 import moulton.scalable.utils.MenuComponent;
 
 public class VertexListPanel extends ListPanel {
+	private final int COMPONENTS_BEFORE_VERTEX_LIST = 3;
+	
 	private Shape shape; //the shape presently
 	private Shape oldShape; //the shape when this was first created
 	private Font font = new Font("Arial", Font.PLAIN, 12);
 	private Menu menu;
+	private StaticTextBox perimeter;
 
 	public VertexListPanel(Menu menu, Shape shape, Panel parent, String x, String y, String shownWidth, String shownHeight, Font font, Color color, boolean defaultShape) {
 		super("25", parent, x, y, shownWidth, shownHeight, "0", color);
@@ -47,14 +51,16 @@ public class VertexListPanel extends ListPanel {
 		});
 		colorBox.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(colorBox);
-		menu.addTouchResponsiveComponent(new Button("newVertex", "New Vertex", this, 0, 2, font, Color.RED));
+		Panel perimPanel = new Panel(this, 0, 2, null);
+		new Caption("Perimeter:", perimPanel, 0, 0, font, Alignment.LEFT_ALIGNMENT);
+		perimeter = new StaticTextBox("perimBox", "0", perimPanel, 1, 0, font, null);
+		menu.addTouchResponsiveComponent(new Button("newVertex", "New Vertex", this, 0, 3, font, Color.RED));
 		this.shape = shape;
 		this.oldShape = defaultShape? null:shape.clone(); //save the way things are now if the user cancels the edit
 		updateVertices();
 	}
 	
 	private void addVertexToGUI(double[] toAdd, int max) {
-		final int COMPONENTS_BEFORE_VERTEX_LIST = 2;
 		int addHeight = this.grid.getGridHeight()-1;
 		int vertexNum = addHeight - COMPONENTS_BEFORE_VERTEX_LIST;
 		//tell the previous vertex, if any, that its down button should be editable
@@ -127,6 +133,8 @@ public class VertexListPanel extends ListPanel {
 				menu.getPolyView().deselect();
 			return true;
 		});
+		
+		updatePerimeter();
 	}
 
 	public void addVertex(double[] toAdd) {
@@ -167,14 +175,21 @@ public class VertexListPanel extends ListPanel {
 	
 	private void updateVertices() {
 		//remove all the vertices from the GUI, then add back in the ones we need
-		while(this.grid.getGridHeight() > 3) {
-			Panel vertexPanel = (Panel)grid.getAt(0, 2);
+		while(this.grid.getGridHeight() > COMPONENTS_BEFORE_VERTEX_LIST+1) {
+			Panel vertexPanel = (Panel)grid.getAt(0, COMPONENTS_BEFORE_VERTEX_LIST);
 			vertexPanel.removeTouchResponsiveness(menu);
-			this.removeComponent(2, true);
+			this.removeComponent(COMPONENTS_BEFORE_VERTEX_LIST, true);
 		}
 		
 		//for each vertex in vertex list
 		for(double[] vertex: shape.getVertices())
 			addVertexToGUI(vertex, shape.getVertices().size()-1);
+		
+		//update the perimeter field
+		updatePerimeter();
+	}
+	
+	public void updatePerimeter() {
+		perimeter.setMessage(Double.toString(shape.getPerimeter()));
 	}
 }

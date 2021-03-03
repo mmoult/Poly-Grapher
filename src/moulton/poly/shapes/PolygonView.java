@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+import java.util.List;
 
 import moulton.poly.comps.CoordControl;
 import moulton.poly.main.Menu;
@@ -124,7 +125,7 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 			xScale = fixedXAxis? this.xScale : coords.width/(hiX-lowX);
 			yScale = fixedYAxis? this.yScale : coords.height/(hiY-lowY);
 			for(Shape shape: shapeList) {
-				LinkedList<double[]> vertices = shape.getVertices();
+				List<double[]> vertices = shape.getVertices();
 				int[] oldVertex = null;
 				int[] firstVertex = null;
 				for(double[] vertex: vertices) {
@@ -371,6 +372,9 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 	
 	public void select(double x, double y) {
 		selected = new double[] {x, y};
+	}
+	public void select(double[] xy) {
+		selected = xy;
 	}
 	public void deselect() {
 		selected = null;
