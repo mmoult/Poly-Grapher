@@ -16,6 +16,7 @@ import java.util.Scanner;
 import javax.imageio.ImageIO;
 
 import moulton.poly.comps.CoordControl;
+import moulton.poly.comps.CreditsPopup;
 import moulton.poly.comps.DragButton;
 import moulton.poly.comps.PathFinderPopup;
 import moulton.poly.shapes.PolygonView;
@@ -27,8 +28,8 @@ import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.Container;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.containers.VirtualPanel;
 import moulton.scalable.containers.PartitionPanel;
+import moulton.scalable.containers.VirtualPanel;
 import moulton.scalable.draggables.ScrollBar;
 import moulton.scalable.popups.ConfirmationPopup;
 import moulton.scalable.texts.Alignment;
@@ -75,8 +76,8 @@ public class Menu extends MenuManager implements ComponentListener{
 		Font boldFont = new Font("Arial", Font.BOLD, 17);
 		font = new Font("Arial", Font.PLAIN, 12);
 		new Caption("PolyGrapher", banner, 2, 0, boldFont, Alignment.CENTER_ALIGNMENT);
-		addTouchResponsiveComponent(new Button("quit", "Quit", banner, 0, 0, font, Color.LIGHT_GRAY));
-		addTouchResponsiveComponent(new Button("clear", "Clear", banner, 1, 0, font, Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("credits", "Credits", banner, 0, 0, font, Color.LIGHT_GRAY));
+		addTouchResponsiveComponent(new Button("clear", "New", banner, 1, 0, font, Color.LIGHT_GRAY));
 		addTouchResponsiveComponent(new Button("save", "Save", banner, 3, 0, font, Color.LIGHT_GRAY));
 		addTouchResponsiveComponent(new Button("load", "Load", banner, 4, 0, font, Color.LIGHT_GRAY));
 		GridFormatter format = banner.getGridFormatter();
@@ -231,9 +232,6 @@ public class Menu extends MenuManager implements ComponentListener{
 			vertices.shiftVertex(num, num-1);
 			return;
 		}switch(id) {
-		case "quit":
-			createExitPopup();
-			break;
 		case "save": //save all the shapes in an export friendly way
 			createPopup(false);
 			break;
@@ -242,6 +240,9 @@ public class Menu extends MenuManager implements ComponentListener{
 			break;
 		case "clear": //clear the shapes from the content list
 			clear();
+			break;
+		case "credits":
+			setPopup(new CreditsPopup("350", "200", Color.WHITE));
 			break;
 		case "newShape":
 			createEditPage(null);
@@ -398,7 +399,6 @@ public class Menu extends MenuManager implements ComponentListener{
 		
 		//save the current perspective in case of a cancel
 		perspective = view.getPerspective();
-		
 		
 		//create the edit page from the shape. If shape is null, create a new one
 		boolean defaultShape = false;

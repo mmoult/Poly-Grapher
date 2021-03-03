@@ -7,6 +7,7 @@ import moulton.poly.comps.NumberFormat;
 import moulton.poly.comps.TouchPanel;
 import moulton.poly.main.Menu;
 import moulton.scalable.clickables.Button;
+import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.ListPanel;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.texts.Alignment;
@@ -53,28 +54,10 @@ public class VertexListPanel extends ListPanel {
 	}
 	
 	private void addVertexToGUI(double[] toAdd, int max) {
+		final int COMPONENTS_BEFORE_VERTEX_LIST = 2;
 		int addHeight = this.grid.getGridHeight()-1;
-		int vertexNum = addHeight - 2;
+		int vertexNum = addHeight - COMPONENTS_BEFORE_VERTEX_LIST;
 		//tell the previous vertex, if any, that its down button should be editable
-		if(vertexNum > 0) {
-			Panel p = (Panel)grid.getAt(0, addHeight-1);
-			boolean foundDown= false;
-			boolean foundDelete = vertexNum!=2; //if it is equal to two, we have to set delete for the first
-			for(MenuComponent mc:p.getAllHeldComponents()) {
-				if(mc instanceof Button) {
-					Button b = (Button) mc;
-					if(b.getId().length()>11 && b.getId().substring(0, 11).equals("vertexDown:")) {
-						b.setEnabled(true);
-						foundDown = true;
-					}else if(b.getId().length()>13 && b.getId().subSequence(0, 13).equals("deleteVertex:")) {
-						b.setEnabled(true);
-						foundDelete = true;
-					}
-					if(foundDown && foundDelete)
-						break;
-				}
-			}
-		}
 		TouchPanel newVertex = new TouchPanel(this, 0, addHeight, null);
 		menu.addTouchResponsiveComponent(newVertex);
 		Button deleteVertex = new Button("deleteVertex:"+vertexNum,"X",newVertex,4,0,font,Color.LIGHT_GRAY);
@@ -83,12 +66,18 @@ public class VertexListPanel extends ListPanel {
 		menu.addTouchResponsiveComponent(deleteVertex);
 		menu.addTouchResponsiveComponent(vertDown);
 		menu.addTouchResponsiveComponent(vertUp);
-		if(addHeight == 2)
+		if(vertexNum == 0)
 			vertUp.setEnabled(false);
-		if(addHeight + 1 == max)
+		if(vertexNum == max)
 			vertDown.setEnabled(false);
-		if(addHeight == 2 && max < 4)
+		if(vertexNum == 0 && max < 1)
 			deleteVertex.setEnabled(false);
+		if(vertexNum > 0) {
+			Panel p = (Panel)grid.getAt(0, addHeight-1);
+			((Clickable) p.getGridFormatter().getAt(3, 0)).setEnabled(true); //set vertex down
+			if(vertexNum != 2)
+				((Clickable) p.getGridFormatter().getAt(4, 0)).setEnabled(true); //set delete vertex
+		}
 		GridFormatter format = newVertex.getGridFormatter();
 		format.specifyColumnWeight(0, 2.0);
 		format.specifyColumnWeight(1, 2.0);
@@ -105,6 +94,32 @@ public class VertexListPanel extends ListPanel {
 		vertexY.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(vertexY);
 		
+		vertexX.setFormChain(vertexY);
+		if(vertexNum > 0) { //link last to now
+			Panel last = (Panel)this.getGridFormatter().getAt(0, addHeight-1);
+			for(MenuComponent mc : last.getAllHeldComponents()) {
+				if(mc instanceof Clickable) {
+					Clickable click = (Clickable)mc;
+					if(click.getId().indexOf("vertexY:") != -1) {
+						click.setFormChain(vertexX);
+						break;
+					}
+				}
+			}
+		}
+		if(vertexNum == max) { //link this to beginning again
+			Panel last = (Panel)this.getGridFormatter().getAt(0, COMPONENTS_BEFORE_VERTEX_LIST);
+			for(MenuComponent mc : last.getAllHeldComponents()) {
+				if(mc instanceof Clickable) {
+					Clickable click = (Clickable)mc;
+					if(click.getId().indexOf("vertexX:") != -1) {
+						vertexY.setFormChain(click);
+						break;
+					}
+				}
+			}
+		}
+		
 		newVertex.setTouchAction(() -> {
 			if(newVertex.isTouched())
 				menu.getPolyView().select(Double.parseDouble(vertexX.getMessage()), Double.parseDouble(vertexY.getMessage()));
@@ -117,7 +132,7 @@ public class VertexListPanel extends ListPanel {
 	public void addVertex(double[] toAdd) {
 		shape.getVertices().add(toAdd);
 		//update from the panels with the vertices. New vertices added just above the new button
-		addVertexToGUI(toAdd, grid.getGridHeight());
+		addVertexToGUI(toAdd, shape.getVertices().size()-1);
 	}
 	
 	public Shape getShape() {
@@ -160,6 +175,6 @@ public class VertexListPanel extends ListPanel {
 		
 		//for each vertex in vertex list
 		for(double[] vertex: shape.getVertices())
-			addVertexToGUI(vertex, 2+shape.getVertices().size());
+			addVertexToGUI(vertex, shape.getVertices().size()-1);
 	}
 }

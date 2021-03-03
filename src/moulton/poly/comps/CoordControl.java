@@ -42,6 +42,12 @@ public class CoordControl extends Panel {
 		new Caption(")",this,"width-width/12","26",font,Alignment.LEFT_ALIGNMENT);
 		new Caption(",",this,"width/1.9","8",font,Alignment.LEFT_ALIGNMENT);
 		new Caption(",",this,"width/1.9","26",font,Alignment.LEFT_ALIGNMENT);
+		
+		//set the form chain
+		lowX.setFormChain(hiX);
+		hiX.setFormChain(lowY);
+		lowY.setFormChain(hiY);
+		hiY.setFormChain(lowX);
 	}
 	
 	public void lockX(boolean shouldLock) {
