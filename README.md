@@ -8,6 +8,3 @@ A simple polygon graphing program. PolyGrapher is built to be quick and versatil
 * Moulton Scalable Menus version 1.13
 
 A pre-compiled jar file is also available for download.
-
-## Use
-
