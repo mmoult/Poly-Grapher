@@ -12,9 +12,11 @@ import moulton.poly.comps.CoordControl;
 import moulton.poly.main.Menu;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.draggables.DraggableComponent;
+import moulton.scalable.draggables.ScrollBar;
+import moulton.scalable.draggables.ScrollableComponent;
 import moulton.scalable.visuals.ImageButton;
 
-public class PolygonView extends ImageButton implements DraggableComponent {
+public class PolygonView extends ImageButton implements DraggableComponent, ScrollableComponent {
 	private static final double SHOULDER_DIVISOR = 5;
 	private double lowX=-1, lowY=-1, hiX=1, hiY=1;
 	private double xScale=0, yScale=0;
@@ -30,6 +32,10 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 	
 	private CoordControl coordControl = null;
 	private ShapeListPanel shapes;
+	
+	private static final int ZOOM_OFFS = 100;
+	private ScrollBar zoomBar = new ScrollBar(true, null, 0, 0, Color.WHITE);
+	
 
 	public PolygonView(Menu menu, ShapeListPanel shapes, Panel parent, String x, String y, String w, String h) {
 		super("", null, parent, x, y, w, h, Color.WHITE);
@@ -44,6 +50,10 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 			}
 			return true;
 		};
+		zoomBar.setOffsets(ZOOM_OFFS, 1, ZOOM_OFFS/2);
+		//we need to render our zoom bar once so that it has a baseline for scrolling sizes
+		Graphics g = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
+		zoomBar.render(g, 0, 0, 0, 500);
 	}
 	
 	public void setCoordControl(CoordControl cc) {
@@ -113,13 +123,31 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 					this.lowY = lowy;
 					this.hiY = hiy;
 				}
-				if(coordControl != null) {
-					coordControl.hiX.setMessage(Double.toString(hiX));
-					coordControl.hiY.setMessage(Double.toString(hiY));
-					coordControl.lowX.setMessage(Double.toString(lowX));
-					coordControl.lowY.setMessage(Double.toString(lowY));
+				setHighX(hiX);
+				setHighY(hiY);
+				setLowX(lowX);
+				setLowY(lowY);
+			} else {
+				//check for any scroll zoom
+				int diff = zoomBar.getOffset()-(ZOOM_OFFS/2);
+				if(diff != 0) {
+					if(!fixedXAxis) {
+						lowX -= (diff/xScale);
+						hiX += (diff/xScale);
+						
+						setHighX(hiX);
+						setLowX(lowX);
+					}if(!fixedYAxis) {
+						lowY -= (diff/yScale);
+						hiY += (diff/yScale);
+						
+						setHighY(hiY);
+						setLowY(lowY);
+					}
 				}
 			}
+			//regardless, reset the zoom
+			zoomBar.setOffset(ZOOM_OFFS/2);
 			
 			//now we can start drawing the shapes
 			xScale = fixedXAxis? this.xScale : coords.width/(hiX-lowX);
@@ -202,28 +230,28 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 		if(!fixedXAxis) {
 			this.lowX = lowX;
 			if(coordControl != null)
-				coordControl.lowX.setMessage(Double.toString(lowX));			
+				coordControl.lowX.setMessage(doubleToString(lowX));			
 		}
 	}
 	public void setLowY(double lowY) {
 		if(!fixedYAxis) {
 			this.lowY = lowY;
 			if(coordControl != null)
-				coordControl.lowY.setMessage(Double.toString(lowY));
+				coordControl.lowY.setMessage(doubleToString(lowY));
 		}
 	}
 	public void setHighX(double highX) {
 		if(!fixedXAxis) {
 			hiX = highX;
 			if(coordControl != null)
-				coordControl.hiX.setMessage(Double.toString(hiX));
+				coordControl.hiX.setMessage(doubleToString(hiX));
 		}
 	}
 	public void setHighY(double highY) {
 		if(!fixedYAxis) {
 			hiY = highY;
 			if(coordControl != null)
-				coordControl.hiY.setMessage(Double.toString(hiY));
+				coordControl.hiY.setMessage(doubleToString(hiY));
 		}
 	}
 	
@@ -378,6 +406,21 @@ public class PolygonView extends ImageButton implements DraggableComponent {
 	}
 	public void deselect() {
 		selected = null;
+	}
+
+	@Override
+	public ScrollBar getWidthScrollBar() {
+		return null;
+	}
+
+	@Override
+	public ScrollBar getHeightScrollBar() {
+		return zoomBar;
+	}
+
+	@Override
+	public int[][] getActiveScrollCoordinates() {
+		return clickBoundary;
 	}
 	
 }

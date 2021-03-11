@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 
 import moulton.scalable.clickables.EventAction;
 import moulton.scalable.clickables.TouchResponsiveComponent;
-import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
 
 public class TouchPanel extends Panel implements TouchResponsiveComponent {
@@ -68,12 +67,6 @@ public class TouchPanel extends Panel implements TouchResponsiveComponent {
 	@Override
 	public int getTouchedCursorType() {
 		return Cursor.DEFAULT_CURSOR;
-	}
-	
-	@Override
-	public void removeTouchResponsiveness(MenuManager manager) {
-		manager.removeTouchResponsiveComponent(this);
-		super.removeTouchResponsiveness(manager);
 	}
 
 }

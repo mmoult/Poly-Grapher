@@ -194,7 +194,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	}
 
 	@Override
-	protected void clickableAction(Clickable c) {
+	public void clickableAction(Clickable c) {
 		String id = c.getId();
 		if(id.length() > 11 && id.substring(0, 11).equals("shapeTitle:")) {
 			int num = Integer.parseInt(id.substring(11));
@@ -345,7 +345,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	}
 
 	@Override
-	protected void lostFocusAction(Clickable c) {
+	public void lostFocusAction(Clickable c) {
 		if(c instanceof TextBox) {
 			TextBox box = (TextBox)c;
 			String id = c.getId();
@@ -424,6 +424,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	private void returnToShapeList() {
 		//remove shapes panel if already in
 		controlPane.removeFreeComponent(shapes);
+		view.deselect();
 		if(vertices != null)
 			vertices.removeTouchResponsiveness(this);
 		
@@ -546,6 +547,11 @@ public class Menu extends MenuManager implements ComponentListener{
 			clear();
 			Scanner scan = null;
 			try {
+				File file = new File(path);
+				if(!file.exists()) {
+					System.err.println("File specified does not exist!");
+					return;
+				}
 				scan = new Scanner(new File(path));
 				while(scan.hasNextLine()) {
 					String line = scan.nextLine();

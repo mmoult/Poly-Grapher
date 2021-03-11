@@ -31,12 +31,12 @@ public class VertexListPanel extends ListPanel {
 		super("25", parent, x, y, shownWidth, shownHeight, "0", color);
 		this.menu = menu;
 		Panel titlePanel = new Panel(this, 0, 0, null);
-		new Caption("Title:",titlePanel,0,0,font,Alignment.LEFT_ALIGNMENT);
+		new Caption("  Title:",titlePanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		TextBox titleBox = new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY);
 		titleBox.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(titleBox);
 		Panel colorPanel = new Panel(this, 0, 1, null);
-		new Caption("Color:",colorPanel,0,0,font,Alignment.LEFT_ALIGNMENT);
+		new Caption("  Color:",colorPanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		String fullColor = ""+Integer.toHexString(shape.getColor().getRGB());
 		if(fullColor.length()>6)
 			fullColor = fullColor.substring(2);
@@ -52,7 +52,7 @@ public class VertexListPanel extends ListPanel {
 		colorBox.setClickSelectsAll(true);
 		menu.addTouchResponsiveComponent(colorBox);
 		Panel perimPanel = new Panel(this, 0, 2, null);
-		new Caption("Perimeter:", perimPanel, 0, 0, font, Alignment.LEFT_ALIGNMENT);
+		new Caption("  Perimeter:", perimPanel, 0, 0, font, Alignment.LEFT_ALIGNMENT);
 		perimeter = new StaticTextBox("perimBox", "0", perimPanel, 1, 0, font, null);
 		menu.addTouchResponsiveComponent(new Button("newVertex", "New Vertex", this, 0, 3, font, Color.RED));
 		this.shape = shape;
