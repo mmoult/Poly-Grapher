@@ -250,7 +250,6 @@ public class Menu extends MenuManager implements ComponentListener{
 			break;
 		case "saveShape": //it should already be saved, we just return
 			returnToShapeList();
-			view.recenter();
 			break;
 		case "cancelShape":
 			if(!vertices.cancel()) //if vertices could not cancel, the shape needs to be deleted

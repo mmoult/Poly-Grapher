@@ -11,6 +11,7 @@ import moulton.scalable.containers.Panel;
 
 public class TouchPanel extends Panel implements TouchResponsiveComponent {
 	protected int lastX, lastY;
+	protected int lastXEnd, lastYEnd;
 	protected boolean touched = false;
 	protected EventAction touchAction = null;
 
@@ -32,9 +33,12 @@ public class TouchPanel extends Panel implements TouchResponsiveComponent {
 		int w = rect.width;
 		int h = rect.height;
 		if(parent != null) {
-			int[][] trueVals = parent.handleOffsets(new int[] {x, x+w, x+w, x}, new int[] {y, y, y+h, y+h}, this);
+			//We don't need to handle all of the vertices, only the important ones
+			int[][] trueVals = parent.handleOffsets(new int[] {x, x+w}, new int[] {y, y+h}, this);
 			lastX = trueVals[0][0];
 			lastY = trueVals[1][0];
+			lastXEnd = trueVals[0][1];
+			lastYEnd = trueVals[1][1];
 		} else {
 			lastX = x;
 			lastY = y;
@@ -43,7 +47,7 @@ public class TouchPanel extends Panel implements TouchResponsiveComponent {
 
 	@Override
 	public boolean isTouchedAt(int x, int y) {
-		return ((x >= lastX && x < lastX+lastWidth) && (y >= lastY && y < lastY+lastHeight));
+		return ((x >= lastX && x < lastXEnd) && (y >= lastY && y < lastYEnd));
 	}
 
 	@Override

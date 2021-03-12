@@ -6,6 +6,7 @@ import java.awt.Font;
 import moulton.poly.comps.NumberFormat;
 import moulton.poly.comps.TouchPanel;
 import moulton.poly.main.Menu;
+import moulton.poly.main.NumberControl;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.ListPanel;
@@ -190,6 +191,6 @@ public class VertexListPanel extends ListPanel {
 	}
 	
 	public void updatePerimeter() {
-		perimeter.setMessage(Double.toString(shape.getPerimeter()));
+		perimeter.setMessage(NumberControl.doubleToString(shape.getPerimeter()));
 	}
 }

@@ -15,7 +15,7 @@ import moulton.scalable.texts.StaticTextBox;
 
 public class CreditsPopup extends Popup {
 	private String creditText =
-			"PolyGrapher version 1.0.1\n"
+			"PolyGrapher version 1.0.2\n"
 			+ "https://github.com/mmoult/Poly-Grapher\n"
 			+ "\n"
 			+ "Project Lead: Matthew Moulton\n"
