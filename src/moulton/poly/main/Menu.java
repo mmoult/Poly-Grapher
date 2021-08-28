@@ -296,6 +296,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		//Path Finder Pop up actions
 		case "doSave":
 			String toPath = ((PathFinderPopup)popup).getPath();
+System.err.println(toPath); //TODO print
 			new FileRepresentation().save(toPath);
 			setPopup(null);
 			//if all this worked, save this as the new file directory
