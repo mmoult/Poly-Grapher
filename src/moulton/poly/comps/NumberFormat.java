@@ -6,7 +6,7 @@ public class NumberFormat extends TextFormat{
 
 	@Override
 	public boolean isValidChar(char c) {
-		return ((c>47 && c<58) || (c>44 && c<47));
+		return ((c>='0' && c<='9') || (c>='-' && c<='.'));
 	}
 
 	@Override

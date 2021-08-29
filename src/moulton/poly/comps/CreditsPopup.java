@@ -43,7 +43,7 @@ public class CreditsPopup extends Popup {
 		new Caption(title,base,"0",""+fm.getHeight(), font, Alignment.LEFT_ALIGNMENT);
 		new Line(base, "1",""+(doubleHeight-1), "width-2", "?", Color.GRAY);
 		
-		addTouchResponsiveComponent(new Button("cancel", "X", base, "width-"+(fm.stringWidth("X")*2), "0", "?width", ""+doubleHeight, font, Color.RED));
+		addTouchComponent(new Button("cancel", "X", base, "width-"+(fm.stringWidth("X")*2), "0", "?width", ""+doubleHeight, font, Color.RED));
 		Font smallFont = new Font("Arial", Font.PLAIN, 12);
 		String boxY = ""+(fontHeight*3);
 		String boxHeight = ""+(doubleHeight*5);
@@ -51,7 +51,7 @@ public class CreditsPopup extends Popup {
 				base, ""+fontHeight, boxY, "?width-"+fontHeight, boxHeight, smallFont, Color.WHITE);
 		ScrollBar boxBar = new ScrollBar(true, base, "width-10", boxY, "9", boxHeight, Color.LIGHT_GRAY);
 		box.setTextScroller(boxBar);
-		addTouchResponsiveComponent(boxBar);
+		addTouchComponent(boxBar);
 		
 		this.width = ""+(doubleHeight*8+10); //doubleHeight serves as padding
 		this.height = ""+(doubleHeight*3 + 8*fontHeight);

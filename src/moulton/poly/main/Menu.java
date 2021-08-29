@@ -4,12 +4,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -18,11 +21,20 @@ import javax.imageio.ImageIO;
 import moulton.poly.comps.CoordControl;
 import moulton.poly.comps.CreditsPopup;
 import moulton.poly.comps.DragButton;
-import moulton.poly.comps.PathFinderPopup;
+import moulton.poly.comps.popups.PathFinderPopup;
+import moulton.poly.comps.popups.RotatePopup;
+import moulton.poly.comps.popups.ScalePopup;
+import moulton.poly.comps.popups.SkewPopup;
+import moulton.poly.comps.popups.TranslatePopup;
 import moulton.poly.shapes.PolygonView;
 import moulton.poly.shapes.Shape;
 import moulton.poly.shapes.ShapeListPanel;
 import moulton.poly.shapes.VertexListPanel;
+import moulton.poly.transformations.Rotate;
+import moulton.poly.transformations.Scale;
+import moulton.poly.transformations.Skew;
+import moulton.poly.transformations.Transformation;
+import moulton.poly.transformations.Translate;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.Container;
@@ -31,6 +43,7 @@ import moulton.scalable.containers.Panel;
 import moulton.scalable.containers.PartitionPanel;
 import moulton.scalable.containers.VirtualPanel;
 import moulton.scalable.draggables.ScrollBar;
+import moulton.scalable.geometrics.Line;
 import moulton.scalable.popups.ConfirmationPopup;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
@@ -58,12 +71,16 @@ public class Menu extends MenuManager implements ComponentListener{
 	private CoordControl coordControl;
 	private double[] perspective = null;
 	private PolygonView view;
+	private Line divider;
 	
 	private BufferedImage pinUp=null, pinDown = null;
 	private BufferedImage yOriDown=null, yOriUp=null;
 	private BufferedImage targetUnfocus=null, targetFocus=null;
 	private BufferedImage magIn=null, magOut=null;
 	private BufferedImage clickStar=null, clickMove=null;
+	
+	private Color niceBlue = new Color(0x9FFF);
+	Color darkishGray = new Color(127, 127, 127);
 
 	public Menu(Container cont) {
 		super(cont);
@@ -76,10 +93,10 @@ public class Menu extends MenuManager implements ComponentListener{
 		Font boldFont = new Font("Arial", Font.BOLD, 17);
 		font = new Font("Arial", Font.PLAIN, 12);
 		new Caption("PolyGrapher", banner, 2, 0, boldFont, Alignment.CENTER_ALIGNMENT);
-		addTouchResponsiveComponent(new Button("credits", "Credits", banner, 0, 0, font, Color.LIGHT_GRAY));
-		addTouchResponsiveComponent(new Button("clear", "New", banner, 1, 0, font, Color.LIGHT_GRAY));
-		addTouchResponsiveComponent(new Button("save", "Save", banner, 3, 0, font, Color.LIGHT_GRAY));
-		addTouchResponsiveComponent(new Button("load", "Load", banner, 4, 0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("credits", "Credits", banner, 0, 0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("clear", "New", banner, 1, 0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("save", "Save", banner, 3, 0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("load", "Load", banner, 4, 0, font, Color.LIGHT_GRAY));
 		GridFormatter format = banner.getGridFormatter();
 		format.specifyColumnWeight(2, 4.0);
 		format.setMargin("5", "5");
@@ -89,7 +106,6 @@ public class Menu extends MenuManager implements ComponentListener{
 		partition.setVerticalPartition("200");
 		controlPane = new Panel(partition, 0, 0, new Color(0xE5E5E5));
 		partition.setLeft(controlPane);
-		Color niceBlue = new Color(0x9FFF);
 		Panel pageBanner = new Panel(controlPane, "0", "0", "width", "20", niceBlue);
 		pageSelected = new Caption("Shapes", pageBanner, 0, 0, font, Alignment.CENTER_ALIGNMENT);
 		shapes = new ShapeListPanel(this, controlPane, "12", "20", "?width", "?height", font, null);
@@ -98,11 +114,10 @@ public class Menu extends MenuManager implements ComponentListener{
 		Panel viewPanel = new Panel(partition, 0, 0, Color.WHITE);
 		partition.setRight(viewPanel);
 		String dragButtonWidth = Integer.toString(DRAG_BUTTON_WIDTH);
-		addTouchResponsiveComponent(new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY));
+		addTouchComponent(new DragButton(this, viewPanel, "0", "0", dragButtonWidth, "height", Color.LIGHT_GRAY));
 		String barHeight = Integer.toString(BUTTON_BAR_HEIGHT);
 		view = new PolygonView(this, shapes, viewPanel, dragButtonWidth,"0","?width","?height-"+barHeight);
 		
-		Color darkishGray = new Color(100,100,100,150);
 		Panel buttonBar = new Panel(viewPanel, dragButtonWidth, "height-"+barHeight, "width", "?height", darkishGray);
 		coordControl = new CoordControl(this, buttonBar, "width-140", "0", "?width", "height", darkishGray);
 		view.setCoordControl(coordControl);
@@ -123,7 +138,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		}
 		ImageButton pinX = new ImageButton("pinX", pinUp, buttonBar, "width-175", "0", "?width-140", "?height/2", Color.LIGHT_GRAY);
 		pinX.setTouchedImage(pinDown);
-		addTouchResponsiveComponent(pinX);
+		addTouchComponent(pinX);
 		pinX.setClickAction(() -> {
 			if(view.toggleXFixed()) {
 				pinX.setTouchedImage(pinUp);
@@ -138,7 +153,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		});
 		ImageButton pinY = new ImageButton("pinY", pinUp, buttonBar, "width-175", "height/2", "?width-140", "?height", Color.LIGHT_GRAY);
 		pinY.setTouchedImage(pinDown);
-		addTouchResponsiveComponent(pinY);
+		addTouchComponent(pinY);
 		pinY.setClickAction(() -> {
 			if(view.toggleYFixed()) {
 				pinY.setTouchedImage(pinUp);
@@ -155,7 +170,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		Color satBlue = new Color(0x8BC1E0);
 		final VirtualPanel buttonDisplay = new VirtualPanel(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
 		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 4, 0, satBlue);
-		addTouchResponsiveComponent(yOrient);
+		addTouchComponent(yOrient);
 		yOrient.setClickAction(() -> {
 			if(view.toggleInvertYAxis())
 				yOrient.setImage(yOriUp);
@@ -165,9 +180,9 @@ public class Menu extends MenuManager implements ComponentListener{
 		});
 		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
 		centerImg.setTouchedImage(targetFocus);
-		addTouchResponsiveComponent(centerImg);
-		addTouchResponsiveComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
-		addTouchResponsiveComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
+		addTouchComponent(centerImg);
+		addTouchComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
+		addTouchComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
 		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
 		clickType.setClickAction(() -> {
 			if(view.toggleClickAction())
@@ -176,7 +191,7 @@ public class Menu extends MenuManager implements ComponentListener{
 				clickType.setImage(clickMove);
 			return true;
 		});
-		addTouchResponsiveComponent(clickType);
+		addTouchComponent(clickType);
 		
 		Font bigFont = new Font("Arial", Font.PLAIN, 20);
 		Button bLeft = new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue);
@@ -184,13 +199,13 @@ public class Menu extends MenuManager implements ComponentListener{
 			buttonDisplay.setXOffs(buttonDisplay.getXOffs() - 40);
 			return true;
 		});
-		addTouchResponsiveComponent(bLeft);
+		addTouchComponent(bLeft);
 		Button bRight = new Button("buttonRight", "}", buttonBar, "width-190", "0", "?width-176", "height", bigFont, niceBlue);
 		bRight.setClickAction(() -> {
 			buttonDisplay.setXOffs(buttonDisplay.getXOffs() + 40);				
 			return true;
 		});
-		addTouchResponsiveComponent(bRight);
+		addTouchComponent(bRight);
 	}
 
 	@Override
@@ -296,7 +311,6 @@ public class Menu extends MenuManager implements ComponentListener{
 		//Path Finder Pop up actions
 		case "doSave":
 			String toPath = ((PathFinderPopup)popup).getPath();
-System.err.println(toPath); //TODO print
 			new FileRepresentation().save(toPath);
 			setPopup(null);
 			//if all this worked, save this as the new file directory
@@ -321,6 +335,71 @@ System.err.println(toPath); //TODO print
 			((PathFinderPopup)popup).emptySelection(false);
 			break;
 			
+		//transformation pop up
+		case "translate":
+			popup = new TranslatePopup(this);
+			break;
+		case "rotate":
+			popup = new RotatePopup(this);
+			break;
+		case "scale":
+			popup = new ScalePopup(this);
+			break;
+		case "skew":
+			popup = new SkewPopup(this);
+			break;
+		case "doTranslate":
+			//all the data for the transform is in the panel. We just have to get to it
+			Panel base = c.getParent();
+			TextBox deltaX = (TextBox)findComponent("deltaX", base);
+			TextBox deltaY = (TextBox)findComponent("deltaY", base);
+			transformShape(new Translate(Double.parseDouble(deltaX.getMessage()),
+					Double.parseDouble(deltaY.getMessage())));
+System.out.println("TRANSLATE");
+System.out.println(Double.parseDouble(deltaX.getMessage()));
+System.out.println(Double.parseDouble(deltaY.getMessage()));
+System.out.println();
+			break;
+		case "doRotate":
+			base = c.getParent();
+			TextBox rotateAngle = (TextBox)findComponent("angle", base);
+			TextBox centerX = (TextBox)findComponent("centerX", base);
+			TextBox centerY = (TextBox)findComponent("centerY", base);
+			transformShape(new Rotate(
+					Double.parseDouble(rotateAngle.getMessage()),
+					Double.parseDouble(centerX.getMessage()),
+					Double.parseDouble(centerY.getMessage())));
+System.out.println("ROTATE");
+System.out.println(Double.parseDouble(rotateAngle.getMessage()));
+System.out.println(Double.parseDouble(centerX.getMessage()));
+System.out.println(Double.parseDouble(centerY.getMessage()));
+System.out.println();
+			break;
+		case "doScale":
+			base = c.getParent();
+			TextBox scaleX = (TextBox)findComponent("scaleX", base);
+			TextBox scaleY = (TextBox)findComponent("scaleY", base);
+			transformShape(new Scale(
+					Double.parseDouble(scaleX.getMessage()),
+					Double.parseDouble(scaleY.getMessage())));
+System.out.println("SCALE");
+System.out.println(Double.parseDouble(scaleX.getMessage()));
+System.out.println(Double.parseDouble(scaleY.getMessage()));
+System.out.println();
+			break;
+		case "doSkew":
+			base = c.getParent();
+			Button horizSkew = (Button)findComponent("horizSkew", base);
+			TextBox skewAngle = (TextBox)findComponent("skewAngle", base);
+System.out.println("SKEW");
+System.out.println(Double.parseDouble(skewAngle.getMessage()));
+System.out.println(horizSkew.isClicked() ? "Horizontal" : "Vertical");
+System.out.println();
+			transformShape(new Skew(
+					Double.parseDouble(skewAngle.getMessage()),
+					horizSkew.isClicked()));
+			break;
+			
 		case "fullExit":
 			((PolyGrapher)cont).running = false;
 			break;
@@ -330,6 +409,30 @@ System.err.println(toPath); //TODO print
 	private void createPopup(boolean shouldLoad) {
 		PathFinderPopup pop = new PathFinderPopup(shouldLoad, "350", "200", lastFilePath);
 		setPopup(pop);
+	}
+	
+	private void transformShape(Transformation t) {
+		//we want to modify the vertices according to the transformation given
+		Shape changed = vertices.getShape();
+		List<double[]> verts = vertices.getShape().getVertices();
+		List<Point2D.Double> pts = new ArrayList<>(verts.size());
+		for(double[] vert: verts)
+			pts.add(new Point2D.Double(vert[0], vert[1]));
+		//perform the transformation
+		t.execute(pts);
+		//update the shape
+		for(int i=0; i<pts.size(); i++) {
+			Point2D.Double pt = pts.get(i);
+			vertices.getVertex(i)[0] = pt.x;
+			vertices.getVertex(i)[1] = pt.y;
+		}
+		//reload the shape data
+		returnToShapeList();
+		createEditPage(changed);
+		view.recenter();
+		
+		//now we want to center the view and remove the pop up
+		popup = null;
 	}
 	
 	private void clear() {
@@ -411,29 +514,45 @@ System.err.println(toPath); //TODO print
 			shapes.addShape(selected); //add to the list
 			defaultShape = true;
 		}
+		shapes.getHeightScrollBar().setEnabled(false);
 		
-		vertices = new VertexListPanel(this, selected, controlPane, "12", "20", "?width", "height-40", font, null, defaultShape);
-		vertices.setHeightScrollBar(shapes.getHeightScrollBar());
+		vertices = new VertexListPanel(this, selected, controlPane, "12", "20", "?width", "?height-70", font, null, defaultShape);
+		vertices.setHeightScrollBar(new ScrollBar(true, controlPane, "0","20","12","?height-70",Color.LIGHT_GRAY));
 		
-		shapeOptions = new Panel(controlPane, "12", "height-20", "?width", "?height", null);
-		addTouchResponsiveComponent(new Button("saveShape","Save",shapeOptions,0,0,font,Color.LIGHT_GRAY));
-		addTouchResponsiveComponent(new Button("cancelShape", "Cancel",shapeOptions,1,0,font,Color.LIGHT_GRAY));
-		shapeOptions.getGridFormatter().setMargin("width/10", null);
+		shapeOptions = new Panel(controlPane, "0", "height-70", "?width", "?height", darkishGray);
+		shapeOptions.getGridFormatter().setMargin("10", "10");
+		shapeOptions.getGridFormatter().specifyRowWeight(0, 2.0);
+		
+		Panel transformations = new Panel(shapeOptions, 0, 0, null);
+		divider = new Line(controlPane, "0", "height-70", "width", "?", Color.BLACK);
+		addTouchComponent(new Button("translate", "Translate", transformations, 0,0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("rotate", "Rotate", transformations, 1,0, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("scale", "Scale", transformations, 0,1, font, Color.LIGHT_GRAY));
+		addTouchComponent(new Button("skew", "Skew", transformations, 1,1, font, Color.LIGHT_GRAY));
+		
+		Panel fileOptions = new Panel(shapeOptions, 0, 1, null);
+		fileOptions.getGridFormatter().setMargin("10", null);
+		Button button = new Button("saveShape","Save",fileOptions,0,0,font,Color.LIGHT_GRAY);
+		button.setTextColor(Color.BLACK);
+		addTouchComponent(button);
+		button = new Button("cancelShape", "Cancel",fileOptions,1,0,font,Color.LIGHT_GRAY);
+		button.setTextColor(Color.BLACK);
+		addTouchComponent(button);
 	}
 	
 	private void returnToShapeList() {
 		//remove shapes panel if already in
 		controlPane.removeFreeComponent(shapes);
 		view.deselect();
-		if(vertices != null)
-			vertices.removeTouchResponsiveness(this);
+		vertices.removeTouchResponsiveness(this);
+		controlPane.removeFreeComponent(vertices.getHeightScrollBar());
 		
 		pageSelected.setText("Shapes");
+		shapeOptions.removeTouchResponsiveness(this);
 		controlPane.removeFreeComponent(vertices);
 		controlPane.removeFreeComponent(shapeOptions);
-		removeTouchResponsiveComponent((Button)findComponent("saveShape", shapeOptions));
-		removeTouchResponsiveComponent(findComponent("cancelShape", shapeOptions));
-		shapes.setHeightScrollBar(shapes.getHeightScrollBar());
+		divider.setVisible(false);
+		
 		controlPane.addFreeComponent(shapes);
 		shapes.updateList();
 	}
@@ -496,8 +615,7 @@ System.err.println(toPath); //TODO print
 	public void componentHidden(ComponentEvent e) {}
 
 	public void createExitPopup() {
-		setPopup(new ConfirmationPopup("Are you sure you want to quit?",
-				"fullExit", "cancel", null, font, false, true));
+		setPopup(new ConfirmationPopup("Are you sure you want to quit?", "fullExit", "cancel", null, font, this, true));
 	}
 	
 	public PolygonView getPolyView() {

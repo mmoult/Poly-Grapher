@@ -82,12 +82,12 @@ public class ShapeListPanel extends ListPanel {
 	
 	private void addTouchComp(TouchResponsiveComponent comp) {
 		touchTemp.add(comp);
-		menu.addTouchResponsiveComponent(comp);
+		menu.addTouchComponent(comp);
 	}
 	
 	public void clearTouchList() {
 		for(TouchResponsiveComponent comp: touchTemp)
-			menu.removeTouchResponsiveComponent(comp);
+			menu.removeTouchComponent(comp);
 		touchTemp.clear();
 	}
 

@@ -35,7 +35,7 @@ public class VertexListPanel extends ListPanel {
 		new Caption("  Title:",titlePanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		TextBox titleBox = new TextBox("titleBox",shape.getTitle(),titlePanel,1,0,font,Color.LIGHT_GRAY);
 		titleBox.setClickSelectsAll(true);
-		menu.addTouchResponsiveComponent(titleBox);
+		menu.addTouchComponent(titleBox);
 		Panel colorPanel = new Panel(this, 0, 1, null);
 		new Caption("  Color:",colorPanel,0,0,font,Alignment.LEFT_ALIGNMENT);
 		String fullColor = ""+Integer.toHexString(shape.getColor().getRGB());
@@ -51,11 +51,11 @@ public class VertexListPanel extends ListPanel {
 			}
 		});
 		colorBox.setClickSelectsAll(true);
-		menu.addTouchResponsiveComponent(colorBox);
+		menu.addTouchComponent(colorBox);
 		Panel perimPanel = new Panel(this, 0, 2, null);
 		new Caption("  Perimeter:", perimPanel, 0, 0, font, Alignment.LEFT_ALIGNMENT);
 		perimeter = new StaticTextBox("perimBox", "0", perimPanel, 1, 0, font, null);
-		menu.addTouchResponsiveComponent(new Button("newVertex", "New Vertex", this, 0, 3, font, Color.RED));
+		menu.addTouchComponent(new Button("newVertex", "New Vertex", this, 0, 3, font, Color.RED));
 		this.shape = shape;
 		this.oldShape = defaultShape? null:shape.clone(); //save the way things are now if the user cancels the edit
 		updateVertices();
@@ -66,13 +66,13 @@ public class VertexListPanel extends ListPanel {
 		int vertexNum = addHeight - COMPONENTS_BEFORE_VERTEX_LIST;
 		//tell the previous vertex, if any, that its down button should be editable
 		TouchPanel newVertex = new TouchPanel(this, 0, addHeight, null);
-		menu.addTouchResponsiveComponent(newVertex);
+		menu.addTouchComponent(newVertex);
 		Button deleteVertex = new Button("deleteVertex:"+vertexNum,"X",newVertex,4,0,font,Color.LIGHT_GRAY);
 		Button vertDown = new Button("vertexDown:"+vertexNum,"v",newVertex,3,0,font,Color.LIGHT_GRAY);
 		Button vertUp = new Button("vertexUp:"+vertexNum, "^",newVertex,2,0,font,Color.LIGHT_GRAY);
-		menu.addTouchResponsiveComponent(deleteVertex);
-		menu.addTouchResponsiveComponent(vertDown);
-		menu.addTouchResponsiveComponent(vertUp);
+		menu.addTouchComponent(deleteVertex);
+		menu.addTouchComponent(vertDown);
+		menu.addTouchComponent(vertUp);
 		if(vertexNum == 0)
 			vertUp.setEnabled(false);
 		if(vertexNum == max)
@@ -94,12 +94,12 @@ public class VertexListPanel extends ListPanel {
 		TextBox vertexX = new TextBox("vertexX:"+vertexNum,""+toAdd[0],newVertex,"5","0","2width/7-10","height",font,Color.LIGHT_GRAY);
 		vertexX.setTextFormat(numberFormat);
 		vertexX.setClickSelectsAll(true);
-		menu.addTouchResponsiveComponent(vertexX);
+		menu.addTouchComponent(vertexX);
 		new Caption(",",newVertex, "2width/7-5","height/2",font,Alignment.CENTER_ALIGNMENT);
 		TextBox vertexY = new TextBox("vertexY:"+vertexNum,""+toAdd[1],newVertex,"2width/7","0","2width/7-10", "height", font,Color.LIGHT_GRAY);
 		vertexY.setTextFormat(numberFormat);
 		vertexY.setClickSelectsAll(true);
-		menu.addTouchResponsiveComponent(vertexY);
+		menu.addTouchComponent(vertexY);
 		
 		vertexX.setFormChain(vertexY);
 		if(vertexNum > 0) { //link last to now
