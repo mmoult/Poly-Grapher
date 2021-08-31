@@ -17,7 +17,7 @@ import moulton.scalable.texts.TextBox;
 public class ScalePopup extends CommonPopup {
 
 	public ScalePopup(MenuManager manager) {
-		super("Scale the shape by some factor around a center point.", "Scale",
+		super("Scale the shape by some horizontal and vertical factor from (0,0).", "Scale",
 				new Font("Arial", Font.PLAIN, 13), "cancel", manager);
 		Font font = new Font("Arial", Font.PLAIN, 13);
 		BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
@@ -31,10 +31,12 @@ public class ScalePopup extends CommonPopup {
 		new Caption("x scale:", options, 0, 0, font, Alignment.RIGHT_ALIGNMENT);
 		TextBox delta = new TextBox("scaleX", "1", options, 1, 0, font, Color.LIGHT_GRAY);
 		delta.setTextFormat(nf);
+		delta.setClickSelectsAll(true);
 		addTouchComponent(delta);
 		new Caption("y scale:", options, 0, 1, font, Alignment.RIGHT_ALIGNMENT);
 		delta = new TextBox("scaleY", "1", options, 1, 1, font, Color.LIGHT_GRAY);
 		delta.setTextFormat(nf);
+		delta.setClickSelectsAll(true);
 		addTouchComponent(delta);
 		
 		Button okButton = new Button("doScale", "Ok", base, "CENTERX",

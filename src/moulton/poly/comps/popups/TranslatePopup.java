@@ -31,10 +31,12 @@ public class TranslatePopup extends CommonPopup {
 		new Caption("delta x:", options, 0, 0, font, Alignment.RIGHT_ALIGNMENT);
 		TextBox delta = new TextBox("deltaX", "0", options, 1, 0, font, Color.LIGHT_GRAY);
 		delta.setTextFormat(nf);
+		delta.setClickSelectsAll(true);
 		addTouchComponent(delta);
 		new Caption("delta y:", options, 0, 1, font, Alignment.RIGHT_ALIGNMENT);
 		delta = new TextBox("deltaY", "0", options, 1, 1, font, Color.LIGHT_GRAY);
 		delta.setTextFormat(nf);
+		delta.setClickSelectsAll(true);
 		addTouchComponent(delta);
 		
 		Button okButton = new Button("doTranslate", "Ok", base, "CENTERX",

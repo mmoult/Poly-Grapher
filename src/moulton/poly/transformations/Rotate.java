@@ -25,6 +25,10 @@ public class Rotate extends Transformation {
 		
 		//for each point
 		for(Double pt: vertices) {
+			//if there is no distance between the origin and the point, do nothing
+			if(pt.x == originX && pt.y == originY)
+				continue;
+			
 			//find the current angle from the origin
 			double hyp = Math.sqrt(Math.pow(originX-pt.x, 2) + Math.pow(originY-pt.y, 2));
 			double rads = getRadiansSlope(origin, pt);

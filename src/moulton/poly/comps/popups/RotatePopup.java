@@ -31,14 +31,17 @@ public class RotatePopup extends CommonPopup {
 		new Caption("rotate angle:", options, 0, 0, font, Alignment.RIGHT_ALIGNMENT);
 		TextBox box = new TextBox("angle", "0", options, 1, 0, font, Color.LIGHT_GRAY);
 		box.setTextFormat(nf);
+		box.setClickSelectsAll(true);
 		addTouchComponent(box);
 		new Caption("center x:", options, 0, 1, font, Alignment.RIGHT_ALIGNMENT);
 		box = new TextBox("centerX", "0", options, 1, 1, font, Color.LIGHT_GRAY);
 		box.setTextFormat(nf);
+		box.setClickSelectsAll(true);
 		addTouchComponent(box);
 		new Caption("center y:", options, 0, 2, font, Alignment.RIGHT_ALIGNMENT);
 		box = new TextBox("centerY", "0", options, 1, 2, font, Color.LIGHT_GRAY);
 		box.setTextFormat(nf);
+		box.setClickSelectsAll(true);
 		addTouchComponent(box);
 		
 		Button okButton = new Button("doRotate", "Ok", base, "CENTERX",

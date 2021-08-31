@@ -40,6 +40,7 @@ public class SkewPopup extends CommonPopup {
 		NumberFormat nf = new NumberFormat();
 		TextBox delta = new TextBox("skewAngle", "0", options, 1, 1, font, Color.LIGHT_GRAY);
 		delta.setTextFormat(nf);
+		delta.setClickSelectsAll(true);
 		addTouchComponent(delta);
 		
 		Button okButton = new Button("doSkew", "Ok", base, "CENTERX",
