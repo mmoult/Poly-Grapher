@@ -78,6 +78,8 @@ public class Menu extends MenuManager implements ComponentListener{
 	private BufferedImage targetUnfocus=null, targetFocus=null;
 	private BufferedImage magIn=null, magOut=null;
 	private BufferedImage clickStar=null, clickMove=null;
+	private BufferedImage unitAxis=null;
+	private BufferedImage showAxes=null, hideAxes=null;
 	
 	private Color niceBlue = new Color(0x9FFF);
 	Color darkishGray = new Color(127, 127, 127);
@@ -133,6 +135,9 @@ public class Menu extends MenuManager implements ComponentListener{
 			magOut = ImageIO.read(getClass().getResource("/mag-out.png"));
 			clickStar = ImageIO.read(getClass().getResource("/click-star.png"));
 			clickMove = ImageIO.read(getClass().getResource("/click-move.png"));
+			unitAxis = ImageIO.read(getClass().getResource("/square.png"));
+			showAxes = ImageIO.read(getClass().getResource("/show-axes.png"));
+			hideAxes = ImageIO.read(getClass().getResource("/hide-axes.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,8 +173,9 @@ public class Menu extends MenuManager implements ComponentListener{
 		});
 		
 		Color satBlue = new Color(0x8BC1E0);
-		final VirtualPanel buttonDisplay = new VirtualPanel(buttonBar, "15", "0", "?width-190", "height", "200", "height", darkishGray);
-		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 4, 0, satBlue);
+		//width of 280 pixels since each button is 40, there are 7 of them = 280 pixels.
+		final VirtualPanel buttonDisplay = new VirtualPanel(buttonBar, "15", "0", "?width-190", "height", "280", "height", darkishGray);
+		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 5, 0, satBlue);
 		addTouchComponent(yOrient);
 		yOrient.setClickAction(() -> {
 			if(view.toggleInvertYAxis())
@@ -192,6 +198,17 @@ public class Menu extends MenuManager implements ComponentListener{
 			return true;
 		});
 		addTouchComponent(clickType);
+		
+		addTouchComponent(new ImageButton("unitAxis", unitAxis, buttonDisplay, 4, 0, satBlue));
+		ImageButton axesToggle = new ImageButton("showAxes", showAxes, buttonDisplay, 6, 0, satBlue);
+		axesToggle.setClickAction(() -> {
+			if(view.toggleShowAxes())
+				axesToggle.setImage(showAxes);
+			else
+				axesToggle.setImage(hideAxes);
+			return true;
+		});
+		addTouchComponent(axesToggle);
 		
 		Font bigFont = new Font("Arial", Font.PLAIN, 20);
 		Button bLeft = new Button("buttonLeft", "{", buttonBar, "1", "0", "14", "height", bigFont, niceBlue);
@@ -282,15 +299,30 @@ public class Menu extends MenuManager implements ComponentListener{
 			vertices.addVertex(new double[] {0,0});
 			view.recenter();
 			break;
+		
 		case "centerImg":
 			view.recenter();
 			break;
-		case "zoomOut":
+		case "unitAxis":
 			double[] viewCoords = view.getPerspective();
-			//so we want to show 1.5 the width and the height as before, but centered same
-			//that means that each side needs to grow .25
 			double width = viewCoords[2]-viewCoords[0];
 			double height = viewCoords[3]-viewCoords[1];
+			double diff = height - width;
+			//we will expand the smaller of the two
+			if(diff > 0) { //expand width
+				view.setLowX(viewCoords[0] - diff/2);
+				view.setHighX(viewCoords[2] + diff/2);
+			}else { //expand height
+				view.setLowY(viewCoords[1] + diff/2);
+				view.setHighY(viewCoords[3] - diff/2);
+			}
+			break;
+		case "zoomOut":
+			viewCoords = view.getPerspective();
+			//so we want to show 1.5 the width and the height as before, but centered same
+			//that means that each side needs to grow .25
+			width = viewCoords[2]-viewCoords[0];
+			height = viewCoords[3]-viewCoords[1];
 			view.setLowX(viewCoords[0] - width/4);
 			view.setHighX(viewCoords[2] + width/4);
 			view.setLowY(viewCoords[1] - height/4);
@@ -355,10 +387,6 @@ public class Menu extends MenuManager implements ComponentListener{
 			TextBox deltaY = (TextBox)findComponent("deltaY", base);
 			transformShape(new Translate(Double.parseDouble(deltaX.getMessage()),
 					Double.parseDouble(deltaY.getMessage())));
-System.out.println("TRANSLATE");
-System.out.println(Double.parseDouble(deltaX.getMessage()));
-System.out.println(Double.parseDouble(deltaY.getMessage()));
-System.out.println();
 			break;
 		case "doRotate":
 			base = c.getParent();
@@ -369,11 +397,6 @@ System.out.println();
 					Double.parseDouble(rotateAngle.getMessage()),
 					Double.parseDouble(centerX.getMessage()),
 					Double.parseDouble(centerY.getMessage())));
-System.out.println("ROTATE");
-System.out.println(Double.parseDouble(rotateAngle.getMessage()));
-System.out.println(Double.parseDouble(centerX.getMessage()));
-System.out.println(Double.parseDouble(centerY.getMessage()));
-System.out.println();
 			break;
 		case "doScale":
 			base = c.getParent();
@@ -382,19 +405,11 @@ System.out.println();
 			transformShape(new Scale(
 					Double.parseDouble(scaleX.getMessage()),
 					Double.parseDouble(scaleY.getMessage())));
-System.out.println("SCALE");
-System.out.println(Double.parseDouble(scaleX.getMessage()));
-System.out.println(Double.parseDouble(scaleY.getMessage()));
-System.out.println();
 			break;
 		case "doSkew":
 			base = c.getParent();
 			Button horizSkew = (Button)findComponent("horizSkew", base);
 			TextBox skewAngle = (TextBox)findComponent("skewAngle", base);
-System.out.println("SKEW");
-System.out.println(Double.parseDouble(skewAngle.getMessage()));
-System.out.println(horizSkew.isClicked() ? "Horizontal" : "Vertical");
-System.out.println();
 			transformShape(new Skew(
 					Double.parseDouble(skewAngle.getMessage()),
 					horizSkew.isClicked()));
@@ -423,8 +438,8 @@ System.out.println();
 		//update the shape
 		for(int i=0; i<pts.size(); i++) {
 			Point2D.Double pt = pts.get(i);
-			vertices.getVertex(i)[0] = pt.x;
-			vertices.getVertex(i)[1] = pt.y;
+			vertices.getVertex(i)[0] = NumberControl.round(pt.x, -PolygonView.PRECISION_DIGITS);
+			vertices.getVertex(i)[1] = NumberControl.round(pt.y, -PolygonView.PRECISION_DIGITS);
 		}
 		//reload the shape data
 		returnToShapeList();

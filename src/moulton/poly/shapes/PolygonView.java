@@ -30,6 +30,7 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 	private boolean fixedYAxis = false;
 	private boolean invertYAxis = false;
 	private boolean createOnClick = true;
+	private boolean showAxes = true;
 	
 	private CoordControl coordControl = null;
 	private ShapeListPanel shapes;
@@ -37,6 +38,7 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 	private static final int ZOOM_OFFS = 100;
 	private static final int ZOOM_INVERSE_SPEED = 200;
 	private ScrollBar zoomBar = new ScrollBar(true, null, 0, 0, Color.WHITE);
+	public static final int PRECISION_DIGITS = 5;
 	
 
 	public PolygonView(Menu menu, ShapeListPanel shapes, Panel parent, String x, String y, String w, String h) {
@@ -158,6 +160,8 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 				yScale = fixedYAxis? this.yScale : coords.height/(hiY-lowY);
 			}
 			
+			drawAxes(g2, coords);
+			
 			//now we can start drawing the shapes
 			for(Shape shape: shapeList) {
 				List<double[]> vertices = shape.getVertices();
@@ -194,7 +198,8 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 				int sy = !invertYAxis? ((int)((selected[1] - lowY)*yScale)): ((int)((hiY - selected[1])*yScale));
 				g2.drawOval(sx-5, sy-5, 10, 10);
 			}
-		}
+		}else
+			drawAxes(g2, coords);
 		recenter = false;
 		
 		super.render(g, xx, yy, ww, hh); //finally render the image
@@ -207,16 +212,40 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 				yScale = coords.height/(hiY-lowY);
 			
 			g.setColor(new Color(100,100,100,150)); //to the translucent gray
-			mx = NumberControl.limitNumber(lowX + mouseX/xScale, 5);
+			mx = NumberControl.limitNumber(lowX + mouseX/xScale, PRECISION_DIGITS);
 			if(!invertYAxis)
-				my = NumberControl.limitNumber(lowY + mouseY/yScale, 5);
+				my = NumberControl.limitNumber(lowY + mouseY/yScale, PRECISION_DIGITS);
 			else
-				my = NumberControl.limitNumber(hiY - mouseY/yScale, 5);
+				my = NumberControl.limitNumber(hiY - mouseY/yScale, PRECISION_DIGITS);
 			String mouseXY = "(" + mx + ", " + my + ")";
 			FontMetrics fm = g.getFontMetrics();
 			g.fillRect(coords.x+coords.width-fm.stringWidth(mouseXY), coords.y, fm.stringWidth(mouseXY), fm.getHeight());
 			g.setColor(Color.BLACK);
 			g.drawString(mouseXY, coords.x+coords.width-fm.stringWidth(mouseXY), coords.y + fm.getHeight()-fm.getDescent());
+		}
+	}
+	
+	private void drawAxes(Graphics g, Rectangle coords) {
+		if(showAxes) {
+			int lineLength = 5;
+			
+			g.setColor(new Color(90, 90, 90));
+			if(lowY <= 0 && hiY >= 0) {
+				int y;
+				if(!invertYAxis)
+					y = (int)((0 - lowY)*yScale);
+				else
+					y = (int)((hiY - 0)*yScale);
+				
+				for(int i=0; i<coords.width; i+=lineLength*2)
+					g.drawLine(i, y, i+lineLength, y);
+			}
+			if(lowX <= 0 && hiX >= 0) {
+				int x = (int)((0 - lowX)*xScale);
+				
+				for(int i=0; i<coords.width; i+=lineLength*2)
+					g.drawLine(x, i, x, i+lineLength);
+			}				
 		}
 	}
 	
@@ -277,6 +306,10 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 	public boolean toggleClickAction() {
 		createOnClick = !createOnClick;
 		return createOnClick;
+	}
+	public boolean toggleShowAxes() {
+		showAxes = !showAxes;
+		return showAxes;
 	}
 	
 	public double[] getPerspective() {

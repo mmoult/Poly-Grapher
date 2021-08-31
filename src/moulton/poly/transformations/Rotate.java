@@ -52,7 +52,7 @@ public class Rotate extends Transformation {
 		if(riseOverRun) {
 			double rads = Math.atan(slope);
 			//check for direction
-			if(from.x > to.x)
+			if(from.x < to.x)
 				rads += Math.PI;
 			return rads;
 		}
