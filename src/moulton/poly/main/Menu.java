@@ -630,7 +630,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void componentHidden(ComponentEvent e) {}
 
 	public void createExitPopup() {
-		setPopup(new ConfirmationPopup("Are you sure you want to quit?", "fullExit", "cancel", null, font, this, true));
+		setPopup(new ConfirmationPopup("Are you sure you want to quit?", null, font, "fullExit", "cancel", this, true));
 	}
 	
 	public PolygonView getPolyView() {

@@ -5,7 +5,7 @@ A simple polygon graphing program. PolyGrapher is built to be quick and versatil
 
 ## Technologies
 * Java version of at least 1.8
-* Moulton Scalable Menus version 1.13
+* Moulton Scalable Menus version 1.14
 
 A pre-compiled jar file is also available for download.
 
@@ -30,8 +30,15 @@ The second and third buttons on the blue button bar are the zoom in and zoom out
 
 The fourth button is the center button. Clicking on this button will center the canvas perspective around all the loaded shapes, which may affect the position and dimensions of the perspective.
 
-The fifth button is the y direction toggle button. There are two states to this button: the downward y (default) and the upward y. Clicking the button will toggle between the two states. The current selected state will determine whether positive y values should be rendered below negatives (as in computer graphics) or above negatives (as in mathematics).
+The fifth button is the square button. When clicked on, the square button will make the scale of the x and y axis shown 1:1.
 
-To the right of the button bar are the two pin buttons. Clicking an unpinned button will pin it, and clicking a pinned button will unpin it. When a button is pinned, no changes can be made to the perspective on the corresponding axis. So for example, when the top button is pinned, no changes can be made to the perspective on the x axis. This behavior trumps any buttons on the button bar or any mouse control.
+The sixth button is the y direction toggle button. There are two states to this button: the downward y (default) and the upward y. Clicking the button will toggle between the two states. The current selected state will determine whether positive y values should be rendered below negatives (as in computer graphics) or above negatives (as in mathematics).
 
-To the right of the pinning buttons is the coordinate control. Here, the perspective can be modified directly. It is also updated when the canvas perspective changes.
+The seventh button is the show axese button. There are two states, shown axes and hidden axes.
+
+### Canvas Control Panel
+To the right of the button bar is the canvas control panel. On this panel, the size of the canvas and the coordinates shown can be directly modified.
+
+On the left, there are pin buttons. Clicking an unpinned button will pin it, and clicking a pinned button will unpin it. When the pin buttons are pressed down, no changes can be made to the selected axis. This is very helpful in conjunction with the buttons on the button bar. For example, if the x-axis is pinned, a zoom out would only zoom out on the y-axis.
+
+On the right of the pinning buttons is the coordinate control text boxes. Here, the perspective can be modified directly. It is also updated when the canvas perspective changes.
