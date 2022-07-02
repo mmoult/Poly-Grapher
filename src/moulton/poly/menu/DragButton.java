@@ -3,7 +3,6 @@ package moulton.poly.menu;
 import java.awt.Color;
 import java.awt.Cursor;
 
-import moulton.poly.main.Menu;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.draggables.DraggableComponent;

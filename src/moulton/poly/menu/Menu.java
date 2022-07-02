@@ -1,4 +1,4 @@
-package moulton.poly.main;
+package moulton.poly.menu;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,10 +18,7 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
-import moulton.poly.menu.CaptionImageButton;
-import moulton.poly.menu.CoordControl;
-import moulton.poly.menu.CreditsPopup;
-import moulton.poly.menu.DragButton;
+import moulton.poly.PolyGrapher;
 import moulton.poly.menu.popups.PathFinderPopup;
 import moulton.poly.menu.popups.RotatePopup;
 import moulton.poly.menu.popups.ScalePopup;
@@ -559,15 +556,18 @@ public class Menu extends MenuManager implements ComponentListener{
 	private void returnToShapeList() {
 		//remove shapes panel if already in
 		controlPane.removeFreeComponent(shapes);
-		view.deselect();
-		vertices.removeTouchResponsiveness(this);
-		controlPane.removeFreeComponent(vertices.getHeightScrollBar());
-		
 		pageSelected.setText("Shapes");
-		shapeOptions.removeTouchResponsiveness(this);
-		controlPane.removeFreeComponent(vertices);
-		controlPane.removeFreeComponent(shapeOptions);
-		divider.setVisible(false);
+		view.deselect();
+		
+		if (vertices != null) {			
+			vertices.removeTouchResponsiveness(this);
+			controlPane.removeFreeComponent(vertices.getHeightScrollBar());
+			
+			shapeOptions.removeTouchResponsiveness(this);
+			controlPane.removeFreeComponent(vertices);
+			controlPane.removeFreeComponent(shapeOptions);
+			divider.setVisible(false);
+		}
 		
 		controlPane.addFreeComponent(shapes);
 		shapes.updateList();

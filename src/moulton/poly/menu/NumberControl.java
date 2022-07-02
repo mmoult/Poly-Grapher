@@ -1,4 +1,4 @@
-package moulton.poly.main;
+package moulton.poly.menu;
 
 public class NumberControl {
 	

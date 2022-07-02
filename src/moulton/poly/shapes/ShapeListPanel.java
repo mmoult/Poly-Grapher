@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.LinkedList;
 
-import moulton.poly.main.Menu;
+import moulton.poly.menu.Menu;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.TouchResponsiveComponent;
 import moulton.scalable.containers.ListPanel;

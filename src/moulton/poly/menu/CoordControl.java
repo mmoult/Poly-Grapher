@@ -3,7 +3,6 @@ package moulton.poly.menu;
 import java.awt.Color;
 import java.awt.Font;
 
-import moulton.poly.main.Menu;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;

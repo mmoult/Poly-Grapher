@@ -1,4 +1,4 @@
-package moulton.poly.main;
+package moulton.poly;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -21,6 +21,7 @@ import java.util.Collections;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import moulton.poly.menu.Menu;
 import moulton.scalable.containers.Container;
 
 public class PolyGrapher extends JPanel implements Container, MouseListener, KeyListener, MouseMotionListener, MouseWheelListener{
