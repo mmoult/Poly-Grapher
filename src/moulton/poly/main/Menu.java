@@ -18,14 +18,15 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
-import moulton.poly.comps.CoordControl;
-import moulton.poly.comps.CreditsPopup;
-import moulton.poly.comps.DragButton;
-import moulton.poly.comps.popups.PathFinderPopup;
-import moulton.poly.comps.popups.RotatePopup;
-import moulton.poly.comps.popups.ScalePopup;
-import moulton.poly.comps.popups.SkewPopup;
-import moulton.poly.comps.popups.TranslatePopup;
+import moulton.poly.menu.CaptionImageButton;
+import moulton.poly.menu.CoordControl;
+import moulton.poly.menu.CreditsPopup;
+import moulton.poly.menu.DragButton;
+import moulton.poly.menu.popups.PathFinderPopup;
+import moulton.poly.menu.popups.RotatePopup;
+import moulton.poly.menu.popups.ScalePopup;
+import moulton.poly.menu.popups.SkewPopup;
+import moulton.poly.menu.popups.TranslatePopup;
 import moulton.poly.shapes.PolygonView;
 import moulton.poly.shapes.Shape;
 import moulton.poly.shapes.ShapeListPanel;
@@ -175,7 +176,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		Color satBlue = new Color(0x8BC1E0);
 		//width of 280 pixels since each button is 40, there are 7 of them = 280 pixels.
 		final VirtualPanel buttonDisplay = new VirtualPanel(buttonBar, "15", "0", "?width-190", "height", "280", "height", darkishGray);
-		ImageButton yOrient = new ImageButton("yOrient", yOriDown, buttonDisplay, 5, 0, satBlue);
+		ImageButton yOrient = new CaptionImageButton("yOrient", yOriDown, "Toggle the vertical direction of the y-axis.", buttonDisplay, 5, 0, satBlue, viewPanel);
 		addTouchComponent(yOrient);
 		yOrient.setClickAction(() -> {
 			if(view.toggleInvertYAxis())
@@ -184,12 +185,12 @@ public class Menu extends MenuManager implements ComponentListener{
 				yOrient.setImage(yOriDown);
 			return true;
 		});
-		ImageButton centerImg = new ImageButton("centerImg", targetUnfocus, buttonDisplay, 3, 0, satBlue);
+		ImageButton centerImg = new CaptionImageButton("centerImg", targetUnfocus, "Focus the screen on the existent polygons.", buttonDisplay, 3, 0, satBlue, viewPanel);
 		centerImg.setTouchedImage(targetFocus);
 		addTouchComponent(centerImg);
-		addTouchComponent(new ImageButton("zoomOut", magOut, buttonDisplay, 2, 0, satBlue));
-		addTouchComponent(new ImageButton("zoomIn", magIn, buttonDisplay, 1, 0, satBlue));
-		ImageButton clickType = new ImageButton("clickType", clickStar, buttonDisplay, 0, 0, satBlue);
+		addTouchComponent(new CaptionImageButton("zoomOut", magOut, "Zoom out", buttonDisplay, 2, 0, satBlue, viewPanel));
+		addTouchComponent(new CaptionImageButton("zoomIn", magIn, "Zoom in", buttonDisplay, 1, 0, satBlue, viewPanel));
+		ImageButton clickType = new CaptionImageButton("clickType", clickStar, "Toggle between using mouse clicks to create vertices or move the perspective.", buttonDisplay, 0, 0, satBlue, viewPanel);
 		clickType.setClickAction(() -> {
 			if(view.toggleClickAction())
 				clickType.setImage(clickStar);
@@ -199,8 +200,8 @@ public class Menu extends MenuManager implements ComponentListener{
 		});
 		addTouchComponent(clickType);
 		
-		addTouchComponent(new ImageButton("unitAxis", unitAxis, buttonDisplay, 4, 0, satBlue));
-		ImageButton axesToggle = new ImageButton("showAxes", showAxes, buttonDisplay, 6, 0, satBlue);
+		addTouchComponent(new CaptionImageButton("unitAxis", unitAxis, "Impose a 1:1 ratio between x and y axes.", buttonDisplay, 4, 0, satBlue, viewPanel));
+		ImageButton axesToggle = new CaptionImageButton("showAxes", showAxes, "Toggle between displaying axes or not.", buttonDisplay, 6, 0, satBlue, viewPanel);
 		axesToggle.setClickAction(() -> {
 			if(view.toggleShowAxes())
 				axesToggle.setImage(showAxes);

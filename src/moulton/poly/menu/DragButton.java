@@ -1,4 +1,4 @@
-package moulton.poly.comps;
+package moulton.poly.menu;
 
 import java.awt.Color;
 import java.awt.Cursor;

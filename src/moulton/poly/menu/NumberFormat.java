@@ -1,4 +1,4 @@
-package moulton.poly.comps;
+package moulton.poly.menu;
 
 import moulton.scalable.texts.TextFormat;
 

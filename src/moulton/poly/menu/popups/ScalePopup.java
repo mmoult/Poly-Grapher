@@ -1,11 +1,11 @@
-package moulton.poly.comps.popups;
+package moulton.poly.menu.popups;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 
-import moulton.poly.comps.NumberFormat;
+import moulton.poly.menu.NumberFormat;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;

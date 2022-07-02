@@ -1,4 +1,4 @@
-package moulton.poly.comps.popups;
+package moulton.poly.menu.popups;
 
 import java.awt.Color;
 import java.awt.Font;

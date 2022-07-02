@@ -8,9 +8,9 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 
-import moulton.poly.comps.CoordControl;
 import moulton.poly.main.Menu;
 import moulton.poly.main.NumberControl;
+import moulton.poly.menu.CoordControl;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.draggables.DraggableComponent;
 import moulton.scalable.draggables.ScrollBar;

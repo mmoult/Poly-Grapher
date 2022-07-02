@@ -3,10 +3,10 @@ package moulton.poly.shapes;
 import java.awt.Color;
 import java.awt.Font;
 
-import moulton.poly.comps.NumberFormat;
-import moulton.poly.comps.TouchPanel;
 import moulton.poly.main.Menu;
 import moulton.poly.main.NumberControl;
+import moulton.poly.menu.NumberFormat;
+import moulton.poly.menu.TouchPanel;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.Clickable;
 import moulton.scalable.containers.ListPanel;
