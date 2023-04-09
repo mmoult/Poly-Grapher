@@ -9,12 +9,12 @@ import moulton.poly.menu.NumberFormat;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.popups.CommonPopup;
+import moulton.scalable.popups.CommonPopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 
-public class ScalePopup extends CommonPopup {
+public class ScalePopup extends CommonPopUp {
 
 	public ScalePopup(MenuManager manager) {
 		super("Scale the shape by some horizontal and vertical factor from (0,0).", "Scale",

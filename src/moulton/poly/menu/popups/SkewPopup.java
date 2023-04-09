@@ -10,12 +10,12 @@ import moulton.scalable.clickables.Button;
 import moulton.scalable.clickables.RadioGroup;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.popups.CommonPopup;
+import moulton.scalable.popups.CommonPopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 
-public class SkewPopup extends CommonPopup {
+public class SkewPopup extends CommonPopUp {
 
 	public SkewPopup(MenuManager manager) {
 		super("Skew the shape by some number of degrees.", "Skew",

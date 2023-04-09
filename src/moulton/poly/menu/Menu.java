@@ -42,11 +42,12 @@ import moulton.scalable.containers.PartitionPanel;
 import moulton.scalable.containers.VirtualPanel;
 import moulton.scalable.draggables.ScrollBar;
 import moulton.scalable.geometrics.Line;
-import moulton.scalable.popups.ConfirmationPopup;
+import moulton.scalable.popups.ConfirmationPopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 import moulton.scalable.utils.GridFormatter;
+import moulton.scalable.utils.MenuSolver;
 import moulton.scalable.visuals.ImageButton;
 
 public class Menu extends MenuManager implements ComponentListener{
@@ -70,6 +71,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	private double[] perspective = null;
 	private PolygonView view;
 	private Line divider;
+	private MenuSolver solve = new MenuSolver();
 	
 	private BufferedImage pinUp=null, pinDown = null;
 	private BufferedImage yOriDown=null, yOriUp=null;
@@ -272,7 +274,7 @@ public class Menu extends MenuManager implements ComponentListener{
 			clear();
 			break;
 		case "credits":
-			setPopup(new CreditsPopup("350", "200", Color.WHITE));
+			setPopUp(new CreditsPopUp("350", "200", Color.WHITE));
 			break;
 		case "newShape":
 			createEditPage(null);
@@ -342,7 +344,7 @@ public class Menu extends MenuManager implements ComponentListener{
 		case "doSave":
 			String toPath = ((PathFinderPopup)popup).getPath();
 			new FileRepresentation().save(toPath);
-			setPopup(null);
+			setPopUp(null);
 			//if all this worked, save this as the new file directory
 			lastFilePath = toPath;
 			break;
@@ -353,7 +355,7 @@ public class Menu extends MenuManager implements ComponentListener{
 			lastFilePath = fromPath;
 			//fall through to cancel/quit
 		case "cancel":
-			setPopup(null);
+			setPopUp(null);
 			break;
 		case "pathUp":
 			((PathFinderPopup)popup).goUpDirectory();
@@ -421,7 +423,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	
 	private void createPopup(boolean shouldLoad) {
 		PathFinderPopup pop = new PathFinderPopup(shouldLoad, "350", "200", lastFilePath);
-		setPopup(pop);
+		setPopUp(pop);
 	}
 	
 	private void transformShape(Transformation t) {
@@ -577,7 +579,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void componentResized(ComponentEvent e) {
 		//try to keep the same aspect ratio of the partition to the window width
 		int newWidth = e.getComponent().getWidth();
-		int partitionX = Integer.parseInt(partition.getVerticalPartition());
+		int partitionX = solve.eval(partition.getVerticalPartition());
 		double ratio = 0;
 		if(windowWidth != 0)
 			ratio = ((double)partitionX)/windowWidth;
@@ -588,7 +590,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	}
 	
 	public double movePartition(double shiftValue) {
-		int partitionX = Integer.parseInt(partition.getVerticalPartition());
+		int partitionX = solve.eval(partition.getVerticalPartition());
 		int before = partitionX;
 		partitionX += (int)shiftValue;
 		if(partitionX < 0)
@@ -603,7 +605,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void mouseMoved(int x, int y) {
 		super.mouseMoved(x, y);
 		if(view != null && partition != null && popup==null) {
-			int offsX = Integer.parseInt(partition.getVerticalPartition()) + DRAG_BUTTON_WIDTH;
+			int offsX = solve.eval(partition.getVerticalPartition()) + DRAG_BUTTON_WIDTH;
 			if(y < cont.getMenuHeight()-BUTTON_BAR_HEIGHT)
 				view.informMouseXY(x-offsX, y-BANNER_HEIGHT);
 			else
@@ -631,7 +633,7 @@ public class Menu extends MenuManager implements ComponentListener{
 	public void componentHidden(ComponentEvent e) {}
 
 	public void createExitPopup() {
-		setPopup(new ConfirmationPopup("Are you sure you want to quit?", null, font, "fullExit", "cancel", this, true));
+		setPopUp(new ConfirmationPopUp("Are you sure you want to quit?", null, font, "fullExit", "cancel", this, true));
 	}
 	
 	public PolygonView getPolyView() {

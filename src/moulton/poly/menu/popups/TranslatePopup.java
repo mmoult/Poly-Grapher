@@ -9,12 +9,12 @@ import moulton.poly.menu.NumberFormat;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.popups.CommonPopup;
+import moulton.scalable.popups.CommonPopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 
-public class TranslatePopup extends CommonPopup {
+public class TranslatePopup extends CommonPopUp {
 
 	public TranslatePopup(MenuManager manager) {
 		super("Shift all vertices of the shape a specified x and y amount.", "Translate",

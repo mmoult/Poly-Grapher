@@ -8,12 +8,12 @@ import java.awt.image.BufferedImage;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.draggables.ScrollBar;
 import moulton.scalable.geometrics.Line;
-import moulton.scalable.popups.Popup;
+import moulton.scalable.popups.PopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.StaticTextBox;
 
-public class CreditsPopup extends Popup {
+public class CreditsPopUp extends PopUp {
 	private String creditText =
 			"PolyGrapher version 1.1.1\n"
 			+ "https://github.com/mmoult/Poly-Grapher\n"
@@ -28,7 +28,7 @@ public class CreditsPopup extends Popup {
 			+ "Made with Moulton Scalable Menus version 1.14\n"
 			+ "© 2022- Matthew Moulton. All Rights Reserved";
 
-	public CreditsPopup(String width, String height, Color color) {
+	public CreditsPopUp(String width, String height, Color color) {
 		super(width, height, color);
 		
 		Font font = new Font("Arial", Font.PLAIN, 13);
@@ -53,8 +53,8 @@ public class CreditsPopup extends Popup {
 		box.setTextScroller(boxBar);
 		addTouchComponent(boxBar);
 		
-		this.width = ""+(doubleHeight*8+10); //doubleHeight serves as padding
-		this.height = ""+(doubleHeight*3 + 8*fontHeight);
+		this.width = solve.parse(""+(doubleHeight*8+10), false, false); //doubleHeight serves as padding
+		this.height = solve.parse(""+(doubleHeight*3 + 8*fontHeight), false, false);
 	}
 
 }

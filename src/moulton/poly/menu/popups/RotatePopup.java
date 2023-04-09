@@ -9,12 +9,12 @@ import moulton.poly.menu.NumberFormat;
 import moulton.scalable.clickables.Button;
 import moulton.scalable.containers.MenuManager;
 import moulton.scalable.containers.Panel;
-import moulton.scalable.popups.CommonPopup;
+import moulton.scalable.popups.CommonPopUp;
 import moulton.scalable.texts.Alignment;
 import moulton.scalable.texts.Caption;
 import moulton.scalable.texts.TextBox;
 
-public class RotatePopup extends CommonPopup {
+public class RotatePopup extends CommonPopUp {
 
 	public RotatePopup(MenuManager manager) {
 		super("Rotate all shape vertices by some number of degrees.", "Rotate",

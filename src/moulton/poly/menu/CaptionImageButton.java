@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import moulton.scalable.containers.Panel;
 import moulton.scalable.texts.LineBreak;
 import moulton.scalable.utils.MenuComponent;
+import moulton.scalable.utils.MenuSolver.Expression;
 import moulton.scalable.visuals.ImageButton;
 
 public final class CaptionImageButton extends ImageButton {
@@ -52,6 +53,7 @@ public final class CaptionImageButton extends ImageButton {
 	private static final class BoxCaption extends MenuComponent {
 		private String text;
 		private int width;
+		private final Expression const100 = solve.parse("100", false, false);
 
 		public BoxCaption(Panel parent, String x, String y, String text, int width) {
 			super(parent, x, y);
@@ -61,7 +63,7 @@ public final class CaptionImageButton extends ImageButton {
 
 		@Override
 		public void render(Graphics g, int xx, int yy, int ww, int hh) {
-			Rectangle rect = getRenderRect(xx, yy, ww, hh, "100", "100");
+			Rectangle rect = getRenderRect(xx, yy, ww, hh, const100, const100);
 			// the parent button is in a container with an x offset of 20
 			final int xOffs = 20;
 			// and has a height of 40 

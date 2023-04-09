@@ -243,7 +243,7 @@ public class PolygonView extends ImageButton implements DraggableComponent, Scro
 			if(lowX <= 0 && hiX >= 0) {
 				int x = (int)((0 - lowX)*xScale);
 				
-				for(int i=0; i<coords.width; i+=lineLength*2)
+				for(int i=0; i<coords.height; i+=lineLength*2)
 					g.drawLine(x, i, x, i+lineLength);
 			}				
 		}
